@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:ClipFlow.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ClipFlow.Controls.SettingItem"
+             Name="Control">
+    <UserControl.Styles>
+        <Style Selector="local|SettingItem">
+            <Setter Property="BackgroundColor" Value="{DynamicResource BorderBackgroundColor}"/>
+        </Style>
+    </UserControl.Styles>
+    <Border Background="{Binding #Control.BackgroundColor}"
+            BorderBrush="{DynamicResource BorderBrushColor}"
+            BorderThickness="{Binding #Control.BorderThickness}"
+            CornerRadius="{Binding #Control.CornerRadius}"
+            Padding="10">
+        <Grid ColumnDefinitions="*,2*" RowDefinitions="Auto,Auto">
+            <Grid Grid.Row="0" Grid.Column="0" 
+                  VerticalAlignment="Center">
+                <TextBlock Text="{Binding #Control.Title}"
+                          FontSize="13"
+                          FontWeight="SemiBold"
+                          VerticalAlignment="Center"/>
+            </Grid>
+            
+            <ContentPresenter Grid.RowSpan="2" Grid.Column="1"
+                            Content="{Binding #Control.ActionContent}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch">
+                <ContentPresenter.Styles>
+                    <Style Selector="ToggleSwitch">
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+                    <Style Selector="ComboBox">
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+					<Style Selector="NumericUpDown">
+						<Setter Property="HorizontalAlignment" Value="Right"/>
+					</Style>
+					<Style Selector="Button">
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+                </ContentPresenter.Styles>
+            </ContentPresenter>
+            
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                      Text="{Binding #Control.Description}"
+                      Foreground="{DynamicResource SystemBaseMediumColor}"
+                      FontSize="11"
+                      Margin="0,4,0,0"/>
+        </Grid>
+    </Border>
+</UserControl> 

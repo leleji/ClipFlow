@@ -1,0 +1,119 @@
+name: build-windows
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      upload_url:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: str/ClipFlow/ClipFlow.csproj
+      Configuration: Release
+
+    steps:
+    # 检出代码
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # 设置 .NET SDK
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 构建解决方案
+    - name: Build Solution
+      run: dotnet build $env:Solution_Name --configuration $env:Configuration
+
+    # 发布应用程序
+    - name: Publish Application
+      run: |
+        $runtimes = @("win-x64", "win-x86", "win-arm64")
+        foreach ($runtime in $runtimes) {
+          # 非自包含发布
+          dotnet publish $env:Solution_Name --configuration $env:Configuration --self-contained false --output ./publish/$runtime --runtime $runtime
+          # 自包含发布
+          dotnet publish $env:Solution_Name --configuration $env:Configuration --self-contained true --output ./publish/$runtime-self-contained --runtime $runtime
+        }
+
+    # 打包发布文件
+    - name: Create ZIP Packages
+      id: create_zip
+      shell: pwsh
+      run: |
+        $runtimes = @("win-x64", "win-x86", "win-arm64")
+        foreach ($runtime in $runtimes) {
+          # 非自包含 ZIP
+          $zipName = "ClipFlow-${{ inputs.version }}-$runtime.zip"
+          Compress-Archive -Path ./publish/$runtime/* -DestinationPath ./$zipName -Force
+          echo "zip_path_$($runtime.Replace('-', '_'))=$zipName" >> $env:GITHUB_ENV
+
+          # 自包含 ZIP 
+          $zipNameSelfContained = "ClipFlow-${{ inputs.version }}-$runtime-self-contained.zip"
+          Compress-Archive -Path ./publish/$runtime-self-contained/* -DestinationPath ./$zipNameSelfContained -Force
+          echo "zip_path_$($runtime.Replace('-', '_'))_self_contained=$zipNameSelfContained" >> $env:GITHUB_ENV
+        }
+
+
+    - name: Upload to GitHub Release
+      shell: bash
+      run: |
+        uploadUrl=${{ inputs.upload_url }}
+    
+        # 定义运行时环境列表
+        runtimes=("win-x64" "win-x86" "win-arm64")
+    
+        # 遍历运行时环境并上传文件
+        for runtime in "${runtimes[@]}"; do
+          # 非自包含 ZIP 包
+          zipName="ClipFlow-${{ inputs.version }}-$runtime.zip"
+          filePath="./$zipName"
+    
+          # 检查文件是否存在
+          if [ ! -f "$filePath" ]; then
+            echo "File $filePath does not exist. Skipping upload."
+          else
+            # 上传文件
+            echo "Uploading $zipName..."
+            curl --request POST \
+              --url "${uploadUrl//\{?name,label\}/?name=$zipName}" \
+              --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              --header "Content-Type: application/zip" \
+              --data-binary @"$filePath" \
+              --fail
+          fi
+    
+          # 自包含 ZIP 包
+          zipNameSelfContained="ClipFlow-${{ inputs.version }}-$runtime-self-contained.zip"
+          filePathSelfContained="./$zipNameSelfContained"
+    
+          # 检查文件是否存在
+          if [ ! -f "$filePathSelfContained" ]; then
+            echo "File $filePathSelfContained does not exist. Skipping upload."
+          else
+            # 上传文件 
+            echo "Uploading $zipNameSelfContained..."
+            curl --request POST \
+              --url "${uploadUrl//\{?name,label\}/?name=$zipNameSelfContained}" \
+              --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              --header "Content-Type: application/zip" \
+              --data-binary @"$filePathSelfContained" \
+              --fail
+          fi
+        done
+
+
+
+
+
+

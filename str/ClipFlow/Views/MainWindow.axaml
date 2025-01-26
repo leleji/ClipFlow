@@ -1,0 +1,132 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ClipFlow.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+        x:Class="ClipFlow.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="ClipFlow"
+        Width="800" Height="500"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="28"
+        WindowStartupLocation="CenterScreen">
+	
+    <Window.Styles>
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="8,2"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SystemListLowColor}"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SystemListMediumColor}"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SystemListMediumColor}"/>
+        </Style>
+
+        <!-- 标题栏样式 -->
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Margin" Value="20,10"/>
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="{DynamicResource SystemAltHighColor}"
+                    TintOpacity="0.8"
+                    MaterialOpacity="0.65"/>
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="130"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧导航面板 -->
+            <Border Grid.Column="0" 
+                    Background="{DynamicResource SystemAltLowColor}"
+                    BorderBrush="{DynamicResource SystemBaseLowColor}"
+                    BorderThickness="0,0,1,0">
+                <Grid RowDefinitions="Auto,*">
+                    <!-- 标题区域 -->
+                    <TextBlock Grid.Row="0" 
+                              Classes="title"
+                              Text="ClipFlow"
+                              Margin="20,30,20,20"/>
+
+                    <!-- 导航菜单 -->
+                    <ScrollViewer Grid.Row="1" 
+                                Margin="0"
+                                Padding="0,0,0,0">
+                        <ListBox ItemsSource="{Binding NavigationItems}"
+                                SelectedItem="{Binding SelectedItem}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*" Height="21">
+                                        <Viewbox Grid.Column="0"
+                                                Width="16" Height="16">
+                                            <Path Data="{Binding Icon}"
+                                                  Fill="{DynamicResource SystemBaseHighColor}"
+                                                  Stretch="Uniform"/>
+                                        </Viewbox>
+                                        <TextBlock Grid.Column="1" 
+                                                 Text="{Binding Name}" 
+                                                 FontSize="13"
+                                                 FontWeight="Normal"
+                                                 Margin="12,0,0,0"
+                                                 VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- 右侧内容区域 -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="0,30,0,0">
+                <!-- 页面标题 -->
+                <TextBlock Grid.Row="0" 
+                          Text="{Binding SelectedItem.Name}" 
+                          FontSize="24"
+                          FontWeight="Normal"
+                          Margin="30,0,30,20"/>
+                
+                <!-- 页面内容 -->
+                <ContentControl Grid.Row="1" 
+                              Content="{Binding CurrentPage}" 
+                             />
+            </Grid>
+        </Grid>
+    </Panel>
+</Window>

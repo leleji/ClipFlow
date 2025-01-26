@@ -1,0 +1,11 @@
+Package: ClipFlow
+Version: 1.0.0
+Section: devel
+Priority: optional
+Architecture: amd64
+Installed-Size: 68279
+Depends: libx11-6, libice6, libsm6, libfontconfig1
+Maintainer: Ken Lee <kenlee@outlook.com>
+Homepage: https://github.com/kenlee/myprogram
+Description: This is MyProgram, great for doing X.
+Copyright: 2022-2024 Ken Lee <kenlee@outlook.com>

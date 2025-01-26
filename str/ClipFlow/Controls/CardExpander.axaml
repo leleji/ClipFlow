@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:ClipFlow.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ClipFlow.Controls.CardExpander">
+    <Border Background="{DynamicResource BorderBackgroundColor}"
+            BorderBrush="{DynamicResource BorderBrushColor}"
+            BorderThickness="1"
+            CornerRadius="4">
+        <DockPanel>
+            <!-- 标题栏 -->
+            <Grid DockPanel.Dock="Top"
+                  Background="Transparent"
+                  ColumnDefinitions="*,Auto"
+                  Margin="10"
+                  Tapped="OnHeaderTapped">
+                <TextBlock Grid.Column="0"
+                          Text="{Binding $parent[local:CardExpander].Header}"
+                          FontSize="15"
+                          FontWeight="SemiBold"/>
+                <PathIcon Grid.Column="1"
+                         Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                         Width="16" Height="16"
+                         RenderTransform="{Binding $parent[local:CardExpander].IsExpanded, 
+                            Converter={x:Static local:RotateConverter.Instance}}">
+                    <PathIcon.Transitions>
+                        <Transitions>
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+                        </Transitions>
+                    </PathIcon.Transitions>
+                </PathIcon>
+            </Grid>
+
+            <!-- 内容区域 -->
+            <Border DockPanel.Dock="Bottom"
+                    BorderBrush="{DynamicResource BorderBrushColor}"
+                    BorderThickness="0,1,0,0"
+                    IsVisible="{Binding $parent[local:CardExpander].IsExpanded}">
+                <ContentPresenter Content="{Binding $parent[local:CardExpander].CardContent}"/>
+            </Border>
+        </DockPanel>
+    </Border>
+</UserControl> 
