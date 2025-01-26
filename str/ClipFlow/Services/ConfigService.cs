@@ -160,8 +160,8 @@ namespace ClipFlow.Services
                 // 如果存在旧文件，先备份
                 if (File.Exists(_configPath))
                 {
-                    var backupPath = _configPath + ".bak";
-                    try { File.Copy(_configPath, backupPath, true); } catch { }
+                    var backupconPath = _configPath + ".bak";
+                    try { File.Copy(_configPath, backupconPath, true); } catch { }
                 }
 
                 // 将临时文件移动到正式位置
