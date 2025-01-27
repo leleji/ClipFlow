@@ -40,7 +40,7 @@ namespace ClipFlow.ViewModels
         [ObservableProperty]
         private bool _isConnectToWebSocket;
 
-        private string _baseUrl;
+        private  string _baseUrl;
         private string _wsUrl;
         private readonly string _clientId = Guid.NewGuid().ToString();
         private readonly HttpClient _httpClient;
@@ -340,7 +340,7 @@ namespace ClipFlow.ViewModels
                     var fileData = await response.Content.ReadAsByteArrayAsync();
 
                     // 创建临时目录
-                    var tempPath = Path.Combine(Path.GetTempPath(), "SyncClipboard");
+                    var tempPath = Path.Combine(Path.GetTempPath(), "ClipFlow");
                     Directory.CreateDirectory(tempPath);
 
                     // 创建一个临时文件来存储
@@ -453,7 +453,7 @@ namespace ClipFlow.ViewModels
                                 {
                                     foreach (var item in data.FilenameList)
                                     {
-                                        await _clipboardMonitor.AddItemToArchive(archive, item);
+                                        await ClipboardUtils.AddItemToArchive(archive, item);
                                     }
                                 }
                                 var zipStream = new FileStream(tempZipPath, FileMode.Open, FileAccess.Read);
@@ -611,6 +611,7 @@ namespace ClipFlow.ViewModels
             }
         }
 
+     
         public void Dispose()
         {
             _uploadCancellationTokenSource?.Cancel();

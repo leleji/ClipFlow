@@ -10,6 +10,10 @@
     <RootNamespace>ClipFlow</RootNamespace>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+	  <AnalysisLevel>8.0</AnalysisLevel>
+	  
+	  
 	  <CFBundleName>ClipFlow</CFBundleName>
 	  <CFBundleDisplayName>ClipFlow</CFBundleDisplayName>
 	  <CFBundleIdentifier>com.leji.ClipFlow</CFBundleIdentifier>

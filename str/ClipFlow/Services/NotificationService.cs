@@ -19,21 +19,16 @@ namespace ClipFlow.Services
         private static NotificationService? _instance;
         public static NotificationService Instance => _instance ??= new NotificationService();
 
-        private readonly bool _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        private readonly bool _isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        private readonly bool _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-        private bool _isWindowsNotificationEnabled = false;
 
         private NotificationService()
         {
-            if (_isWindows)
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 10240))
             {
                 try
                 {
                     
                     // 尝试初始化通知
                     var notifier = ToastNotificationManager.CreateToastNotifier("ClipFlow");
-                    _isWindowsNotificationEnabled = true;
 
                     try
                     {
@@ -47,15 +42,14 @@ namespace ClipFlow.Services
                 }
                 catch (Exception ex)
                 {
-                    FileLogService._.Error("初始化 Windows 通知失败，将使用备用通知方式", ex);
-                    _isWindowsNotificationEnabled = false;
+                    FileLogService._.Error("初始化 Windows 通知失败", ex);
                 }
             }
-            else if (_isMacOS)
+            else if (OperatingSystem.IsMacOS())
             {
                 InitializeMacOSNotifications();
             }
-            else if (_isLinux)
+            else if (OperatingSystem.IsLinux())
             {
                 InitializeLinuxNotifications();
             }
@@ -79,76 +73,47 @@ namespace ClipFlow.Services
             }
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("windows10.0.10240")]
         private async Task ShowWindowsNotificationAsync(string title, string message)
         {
-            if (!_isWindowsNotificationEnabled)
+            await Dispatcher.UIThread.InvokeAsync( () =>
             {
-                // 如果 Windows 通知不可用，使用备用方案
-                await ShowFallbackNotificationAsync(title, message);
-                return;
-            }
-
-            try
-            {
-                var template = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
-                var textNodes = template.GetElementsByTagName("text");
-                textNodes[0].AppendChild(template.CreateTextNode(title));
-                textNodes[1].AppendChild(template.CreateTextNode(message));
-
-                var toast = new ToastNotification(template)
+                try
                 {
-                    ExpirationTime = DateTime.Now.AddSeconds(5)
-                };
+                    var template = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+                    var textNodes = template.GetElementsByTagName("text");
+                    textNodes[0].AppendChild(template.CreateTextNode(title));
+                    textNodes[1].AppendChild(template.CreateTextNode(message));
 
-                var notifier = ToastNotificationManager.CreateToastNotifier("ClipFlow");
-                notifier.Show(toast);
-            }
-            catch (Exception ex)
-            {
-                FileLogService._.Error("显示 Windows 通知失败，切换到备用通知", ex);
-                await ShowFallbackNotificationAsync(title, message);
-            }
-        }
-
-        private async Task ShowFallbackNotificationAsync(string title, string message)
-        {
-            try
-            {
-                // 使用 Avalonia 的窗口作为备用通知方式
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                    var toast = new ToastNotification(template)
                     {
-                        var mainWindow = desktop.MainWindow;
-                        if (mainWindow != null)
-                        {
-                            // TODO: 在主窗口显示一个临时的通知提示
-                            // 可以使用 Toast 控件或自定义的通知控件
-                        }
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                FileLogService._.Error("显示备用通知失败", ex);
-            }
+                        ExpirationTime = DateTime.Now.AddSeconds(5)
+                    };
+
+                    var notifier = ToastNotificationManager.CreateToastNotifier("ClipFlow");
+                    notifier.Show(toast);
+                }
+                catch (Exception ex)
+                {
+                    FileLogService._.Error("显示 Windows 通知失败", ex);
+                }
+            });
+           
         }
+
 
         public async Task ShowNotificationAsync(string title, string message)
         {
-            if (_isWindows)
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 10240))
             {
-                await Dispatcher.UIThread.InvokeAsync(async () =>
-                {
-                    await ShowWindowsNotificationAsync(title, message);
-                });
+               
+                await ShowWindowsNotificationAsync(title, message);
             }
-            else if (_isMacOS)
+            else if (OperatingSystem.IsMacOS())
             {
                 await ShowMacOSNotificationAsync(title, message);
             }
-            else if (_isLinux)
+            else if (OperatingSystem.IsLinux())
             {
                 await ShowLinuxNotificationAsync(title, message);
             }
@@ -241,7 +206,7 @@ namespace ClipFlow.Services
 
         public void Dispose()
         {
-            if (_isWindows && _isWindowsNotificationEnabled)
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 10240))
             {
                 try
                 {
