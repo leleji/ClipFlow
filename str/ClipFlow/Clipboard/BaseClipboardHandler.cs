@@ -138,10 +138,13 @@ namespace ClipFlow.Clipboard
                 {
                     var clipboard = desktop.MainWindow.Clipboard;
                     var formats = await clipboard.GetFormatsAsync();
-
+                    foreach (var format in formats) {
+                        var clipboardFiles = await clipboard.GetDataAsync(format);
+                    }
                     if (formats.Contains(FileFormat))
                     {
                         var clipboardFiles = await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
+
                         if (clipboardFiles != null)
                         {
                             var filesHash = ClipboardUtils.GetMd5Hash(string.Join("|", clipboardFiles.Select(f => f.Path.LocalPath)));
