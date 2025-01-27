@@ -19,6 +19,71 @@ namespace ClipFlow.Clipboard
             return BitConverter.ToString(bytes).ToLower();
         }
 
+        public static async Task<List<string>> ExtractZipArchive(string zipFilePath)
+        {
+            var extractedPaths = new List<string>();
+            var extractPath = Path.GetDirectoryName(zipFilePath)!;
+            var processedFirstLevelDirs = new HashSet<string>();
+
+            try
+            {
+                using (var archive = ZipFile.OpenRead(zipFilePath))
+                {
+                    // 先处理所有条目，创建完整的目录结构
+                    foreach (var entry in archive.Entries)
+                    {
+                        var fullPath = Path.GetFullPath(Path.Combine(extractPath, entry.FullName));
+
+                        // 确保解压路径在目标目录内
+                        if (!fullPath.StartsWith(extractPath))
+                        {
+                            LogService.Instance.AddLog("警告", $"检测到潜在的路径遍历攻击: {entry.FullName}");
+                            continue;
+                        }
+
+                        if (entry.Name == "") // 文件夹
+                        {
+                            Directory.CreateDirectory(fullPath);
+                        }
+                        else // 文件
+                        {
+                            // 确保文件的目录存在
+                            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+                            // 解压文件
+                            entry.ExtractToFile(fullPath, true);
+                        }
+
+                        // 只处理第一层的路径
+                        var relativePath = entry.FullName.TrimEnd('/');
+                        var pathParts = relativePath.Split('/', '\\');
+                        if (pathParts.Length == 1) // 第一层的文件
+                        {
+                            if (!string.IsNullOrEmpty(entry.Name)) // 是文件
+                            {
+                                extractedPaths.Add(fullPath);
+                            }
+                        }
+                        else if (pathParts.Length > 1) // 可能是子文件夹
+                        {
+                            var firstLevelDir = Path.Combine(extractPath, pathParts[0]);
+                            if (!processedFirstLevelDirs.Contains(firstLevelDir))
+                            {
+                                extractedPaths.Add(firstLevelDir + Path.DirectorySeparatorChar);
+                                processedFirstLevelDirs.Add(firstLevelDir);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.Instance.AddLog("错误", $"解压文件失败: {ex.Message}");
+                throw;
+            }
+
+            return extractedPaths;
+        }
+
         public static async Task CreateZipArchive(ZipArchive archive, IEnumerable<string> paths)
         {
             // 找到所有路径的共同父目录

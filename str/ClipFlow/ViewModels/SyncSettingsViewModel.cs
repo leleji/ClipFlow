@@ -350,23 +350,8 @@ namespace ClipFlow.ViewModels
                     if (data.Type == ClipboardType.FileList)
                     {
 
-                        // 解压ZIP文件
-                        using (var archive = ZipFile.OpenRead(tempfilePath))
-                        {
-                            foreach (var entry in archive.Entries)
-                            {
-                                var extractPath = Path.Combine(tempPath, entry.Name);
-                                // 如果文件已存在，先删除
-                                if (File.Exists(extractPath))
-                                {
-                                    File.Delete(extractPath);
-                                }
-                                // 解压文件
-                                entry.ExtractToFile(extractPath, true);
-                                data.FilenameList.Add(extractPath);
-                            }
-
-                        }
+                        var extractedFiles = await ClipboardUtils.ExtractZipArchive(tempfilePath);
+                        data.FilenameList.AddRange(extractedFiles);
                     }
                     else
                     {
