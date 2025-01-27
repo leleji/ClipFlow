@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
 using ClipFlow.Services;
@@ -35,6 +36,9 @@ namespace ClipFlow.Clipboard
         public virtual void Cleanup() { }
 
         protected abstract string FileFormat { get; }
+
+        protected abstract Task<IEnumerable<IStorageItem>?> GetStorageItemsFromClipboard(IClipboard clipboardData);
+        protected abstract Task<bool> SetStorageItemsToClipboard(DataObject dataObject, IEnumerable<IStorageItem> items);
 
         public async Task<bool> SetContentAsync(ClipboardData data, bool isServerUpdate = true)
         {
@@ -97,10 +101,17 @@ namespace ClipFlow.Clipboard
                                 if (storageItems.Count > 0)
                                 {
                                     var dataObject = new DataObject();
-                                    dataObject.Set(FileFormat, storageItems);
-                                    await clipboard.SetDataObjectAsync(dataObject);
-                                    _lastHash = ClipboardUtils.GetMd5Hash(string.Join("|", data.FilenameList));
-                                    LogService.Instance.AddLog("已接收", data.Description);
+                                    if (await SetStorageItemsToClipboard(dataObject, storageItems))
+                                    {
+                                        await clipboard.SetDataObjectAsync(dataObject);
+                                        _lastHash = ClipboardUtils.GetMd5Hash(string.Join("|", data.FilenameList));
+                                        LogService.Instance.AddLog("已接收", data.Description);
+                                    }
+                                    else
+                                    {
+                                        LogService.Instance.AddLog("错误", "设置剪贴板文件失败");
+                                        return false;
+                                    }
                                 }
                                 else
                                 {
@@ -139,17 +150,10 @@ namespace ClipFlow.Clipboard
                 {
                     var clipboard = desktop.MainWindow.Clipboard;
                     var formats = await clipboard.GetFormatsAsync();
-                    foreach (var format in formats) {
-                        var clipboardFiles = await clipboard.GetDataAsync(format);
-                    }
-                    var bytes = await clipboard.GetDataAsync(FileFormat) as byte[];
-                    var str = Encoding.UTF8.GetString(bytes!);
-                    var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
-                                        .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
                     if (formats.Contains(FileFormat))
                     {
-                        var clipboardFiles = await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
-
+                        var clipboardFiles = await GetStorageItemsFromClipboard(clipboard);
                         if (clipboardFiles != null)
                         {
                             var filesHash = ClipboardUtils.GetMd5Hash(string.Join("|", clipboardFiles.Select(f => f.Path.LocalPath)));

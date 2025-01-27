@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
 using ClipFlow.Services;
@@ -14,5 +16,15 @@ namespace ClipFlow.Clipboard
     {
         protected override string FileFormat => "Files";
 
+        protected override async Task<IEnumerable<IStorageItem>?> GetStorageItemsFromClipboard(IClipboard clipboard)
+        {
+            return await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
+        }
+
+        protected override Task<bool> SetStorageItemsToClipboard(DataObject dataObject, IEnumerable<IStorageItem> items)
+        {
+            dataObject.Set(FileFormat, items);
+            return Task.FromResult(true);
+        }
     }
 } 
