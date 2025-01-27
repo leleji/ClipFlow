@@ -1,3 +1,4 @@
+using ABI.System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -24,7 +25,9 @@ namespace ClipFlow.Clipboard
             var bytes = await clipboard.GetDataAsync(FileFormat) as byte[];
             var str = Encoding.UTF8.GetString(bytes!);
             var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
-                                .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                                .Where(x => !string.IsNullOrEmpty(x))
+                                .Select(v=> { return (new System.Uri(v)).LocalPath; })
+                                .ToArray();
             if (pathList.Length > 1)
             {
                 if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
