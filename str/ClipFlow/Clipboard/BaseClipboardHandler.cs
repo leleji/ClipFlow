@@ -8,6 +8,7 @@ using ClipFlow.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ClipFlow.Clipboard
@@ -141,6 +142,10 @@ namespace ClipFlow.Clipboard
                     foreach (var format in formats) {
                         var clipboardFiles = await clipboard.GetDataAsync(format);
                     }
+                    var bytes = await clipboard.GetDataAsync(FileFormat) as byte[];
+                    var str = Encoding.UTF8.GetString(bytes!);
+                    var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+                                        .Where(x => !string.IsNullOrEmpty(x)).ToArray();
                     if (formats.Contains(FileFormat))
                     {
                         var clipboardFiles = await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
