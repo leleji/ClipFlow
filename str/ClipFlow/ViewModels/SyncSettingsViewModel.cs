@@ -451,10 +451,7 @@ namespace ClipFlow.ViewModels
                             case ClipboardType.FileList:
                                 using (var archive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create))
                                 {
-                                    foreach (var item in data.FilenameList)
-                                    {
-                                        await ClipboardUtils.AddItemToArchive(archive, item);
-                                    }
+                                    await ClipboardUtils.CreateZipArchive(archive, data.FilenameList);
                                 }
                                 var zipStream = new FileStream(tempZipPath, FileMode.Open, FileAccess.Read);
                                 content = new StreamContent(zipStream);

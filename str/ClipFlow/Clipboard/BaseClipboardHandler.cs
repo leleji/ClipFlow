@@ -150,7 +150,8 @@ namespace ClipFlow.Clipboard
                 {
                     var clipboard = desktop.MainWindow.Clipboard;
                     var formats = await clipboard.GetFormatsAsync();
-
+                   var DSD=await  clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
+                    var fdfd= DSD?.ToArray();
                     if (formats.Contains(FileFormat))
                     {
                         var clipboardFiles = await GetStorageItemsFromClipboard(clipboard);

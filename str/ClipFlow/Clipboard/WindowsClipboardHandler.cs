@@ -18,6 +18,8 @@ namespace ClipFlow.Clipboard
 
         protected override async Task<IEnumerable<IStorageItem>?> GetStorageItemsFromClipboard(IClipboard clipboard)
         {
+
+    
             return await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
         }
 

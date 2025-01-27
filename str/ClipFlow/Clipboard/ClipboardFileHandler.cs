@@ -4,7 +4,6 @@ using ClipFlow.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,6 +53,5 @@ namespace ClipFlow.Clipboard
                 Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(v => v.Name))}"
             };
         }
-
     }
 } 

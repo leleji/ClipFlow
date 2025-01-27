@@ -45,7 +45,7 @@ namespace ClipFlow.Clipboard
             if (_isMonitoring) return;
 
             _isMonitoring = true;
-            _timer = new Timer(10000); // 每秒检查一次
+            _timer = new Timer(1000); // 每秒检查一次
             _timer.Elapsed += (s, e) =>
             {
                 // 在 UI 线程上执行检查
