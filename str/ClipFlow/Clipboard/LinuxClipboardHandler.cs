@@ -25,13 +25,13 @@ namespace ClipFlow.Clipboard
             var str = Encoding.UTF8.GetString(bytes!);
             var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrEmpty(x)).ToArray();
-            if (pathList.Length > 2)
+            if (pathList.Length > 1)
             {
                 if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
                   desktop.MainWindow?.Clipboard != null)
                 {
                     var provider = desktop.MainWindow.StorageProvider;
-                    foreach (var path in pathList)
+                    foreach (var path in pathList.Skip(1))
                     {
                         IStorageItem? item = null;
                         if (System.IO.Directory.Exists(path))
