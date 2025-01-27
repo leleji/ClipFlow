@@ -9,6 +9,7 @@ using ClipFlow.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClipFlow.Clipboard
 {
@@ -18,15 +19,49 @@ namespace ClipFlow.Clipboard
 
         protected override async Task<IEnumerable<IStorageItem>?> GetStorageItemsFromClipboard(IClipboard clipboard)
         {
-
-    
             return await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
         }
 
-        protected override Task<bool> SetStorageItemsToClipboard(DataObject dataObject, IEnumerable<IStorageItem> items)
+        protected override async Task<DataObject?> SetStorageItemsToClipboard(ClipboardData data)
         {
-            dataObject.Set(FileFormat, items);
-            return Task.FromResult(true);
+            
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
+                   desktop.MainWindow?.Clipboard != null)
+            {
+                var provider = desktop.MainWindow.StorageProvider;
+                var storageItems = new List<IStorageItem>();
+                foreach (var file in data.FilenameList)
+                {
+                    IStorageItem? item = null;
+                    if (System.IO.Directory.Exists(file))
+                    {
+                        item = await provider.TryGetFolderFromPathAsync(file);
+                    }
+                    else if (System.IO.File.Exists(file))
+                    {
+                        item = await provider.TryGetFileFromPathAsync(file);
+                    }
+                    else
+                    {
+                        LogService.Instance.AddLog("警告", $"文件不存在: {file}");
+                        continue;
+                    }
+
+                    if (item != null)
+                    {
+                        storageItems.Add(item);
+                    }
+                }
+
+                if (storageItems.Count > 0)
+                {
+                    var dataObject = new DataObject();
+                    dataObject.Set(FileFormat, storageItems);
+                    return dataObject;
+                }
+            }
+            return null;
+
         }
     }
 } 

@@ -63,15 +63,16 @@ namespace ClipFlow.Clipboard
             return storageItems;
         }
 
-        protected override Task<bool> SetStorageItemsToClipboard(DataObject dataObject, IEnumerable<IStorageItem> items)
+        protected override async Task<DataObject?> SetStorageItemsToClipboard(ClipboardData data)
         {
-            dataObject.Set("Text", Encoding.UTF8.GetBytes(string.Join('\n', items.Select(v => v.Path.LocalPath))));
-            var uriEnum = items.Select(file => file.Path);
+            var dataObject = new DataObject();
+            dataObject.Set("Text", Encoding.UTF8.GetBytes(string.Join('\n', data.FilenameList.Select(v => v))));
+            var uriEnum = data.FilenameList.Select(file => new System.Uri(file).GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped));
             var uris = string.Join("\n", uriEnum);
             dataObject.Set("text/uri-list", Encoding.UTF8.GetBytes(uris));
             var nautilus = $"x-special/nautilus-clipboard\ncopy\n{uris}\n";
             dataObject.Set(FileFormat, nautilus);
-            return Task.FromResult(true);
+            return await Task.FromResult(dataObject); 
         }
     }
 } 
