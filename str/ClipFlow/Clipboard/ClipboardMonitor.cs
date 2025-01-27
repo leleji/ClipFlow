@@ -247,20 +247,52 @@ namespace ClipFlow.Clipboard
                             if (data.FilenameList.Any())
                             {
                                 var provider = desktop.MainWindow.StorageProvider;
-                                var storageItems = data.FilenameList.Select<string, IStorageItem?>(file =>
+                                var storageItems = new List<IStorageItem>();
+
+                                foreach (var file in data.FilenameList)
                                 {
-                                    if (Directory.Exists(file))
+                                    try
                                     {
-                                        return provider.TryGetFolderFromPathAsync(file).Result;
+                                        IStorageItem? item = null;
+                                        if (Directory.Exists(file))
+                                        {
+                                            item = await provider.TryGetFolderFromPathAsync(file);
+                                        }
+                                        else if (File.Exists(file))
+                                        {
+                                            item = await provider.TryGetFileFromPathAsync(file);
+                                        }
+                                        else
+                                        {
+                                            LogService.Instance.AddLog("警告", $"文件不存在: {file}");
+                                            continue;
+                                        }
+
+                                        if (item != null)
+                                        {
+                                            storageItems.Add(item);
+                                        }
                                     }
-                                    return provider.TryGetFileFromPathAsync(file).Result;
-                                }).Where(item => item is not null);
-                                var dataObject = new DataObject();
-                                dataObject.Set("Files", storageItems);
-                                await clipboard.SetDataObjectAsync(dataObject);
-                                _lastHash = GetMd5Hash(string.Join("|", data.FilenameList));
-                                data.Description = $"{storageItems.Count()} 个文件: {string.Join(", ", storageItems.Select(v => v.Name))}";
-                                LogService.Instance.AddLog("已接收", data.Description);
+                                    catch (Exception ex)
+                                    {
+                                        LogService.Instance.AddLog("警告", $"处理文件失败: {file} - {ex.Message}");
+                                    }
+                                }
+
+                                if (storageItems.Any())
+                                {
+                                    var dataObject = new DataObject();
+                                    dataObject.Set("Files", storageItems);
+                                    await clipboard.SetDataObjectAsync(dataObject);
+                                    _lastHash = GetMd5Hash(string.Join("|", data.FilenameList));
+                                    data.Description = $"{storageItems.Count} 个文件: {string.Join(", ", storageItems.Select(v => v.Name))}";
+                                    LogService.Instance.AddLog("已接收", data.Description);
+                                }
+                                else
+                                {
+                                    LogService.Instance.AddLog("错误", "没有可用的文件可以设置到剪贴板");
+                                    return false;
+                                }
                             }
                             break;
                     }
