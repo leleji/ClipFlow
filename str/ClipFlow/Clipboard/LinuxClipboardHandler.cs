@@ -58,6 +58,11 @@ namespace ClipFlow.Clipboard
 
         protected override Task<bool> SetStorageItemsToClipboard(DataObject dataObject, IEnumerable<IStorageItem> items)
         {
+            dataObject.Set("Text", Encoding.UTF8.GetBytes(string.Join('\n', items.Select(v => v.Path.LocalPath))));
+            var uriEnum = items.Select(file => file.Path);
+            var uris = string.Join("\n", uriEnum);
+            dataObject.Set("text/uri-list", Encoding.UTF8.GetBytes(uris));
+            var nautilus = $"x-special/nautilus-clipboard\ncopy\n{uris}\n";
             dataObject.Set(FileFormat, items);
             return Task.FromResult(true);
         }
