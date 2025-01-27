@@ -26,7 +26,6 @@ namespace ClipFlow.Clipboard
             var str = Encoding.UTF8.GetString(bytes!);
             var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrEmpty(x))
-                                .Select(v=> { return (new System.Uri(v)).LocalPath; })
                                 .ToArray();
             if (pathList.Length > 1)
             {
@@ -34,7 +33,7 @@ namespace ClipFlow.Clipboard
                   desktop.MainWindow?.Clipboard != null)
                 {
                     var provider = desktop.MainWindow.StorageProvider;
-                    foreach (var path in pathList.Skip(1))
+                    foreach (var path in pathList.Skip(1).Select(v => { return (new System.Uri(v)).LocalPath; }))
                     {
                         IStorageItem? item = null;
                         if (System.IO.Directory.Exists(path))
