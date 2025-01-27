@@ -70,7 +70,7 @@ namespace ClipFlow.Clipboard
             var uris = string.Join("\n", uriEnum);
             dataObject.Set("text/uri-list", Encoding.UTF8.GetBytes(uris));
             var nautilus = $"x-special/nautilus-clipboard\ncopy\n{uris}\n";
-            dataObject.Set(FileFormat, items);
+            dataObject.Set(FileFormat, nautilus);
             return Task.FromResult(true);
         }
     }
