@@ -24,6 +24,7 @@ namespace ClipFlow.Clipboard
             var extractedPaths = new List<string>();
             var extractPath = Path.GetDirectoryName(zipFilePath)!;
             var processedFirstLevelDirs = new HashSet<string>();
+            var processedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             try
             {
@@ -32,12 +33,20 @@ namespace ClipFlow.Clipboard
                     // 先处理所有条目，创建完整的目录结构
                     foreach (var entry in archive.Entries)
                     {
-                        var fullPath = Path.GetFullPath(Path.Combine(extractPath, entry.FullName));
+                        // 标准化路径分隔符
+                        var normalizedEntryName = entry.FullName.Replace('\\', '/');
+                        var fullPath = Path.GetFullPath(Path.Combine(extractPath, normalizedEntryName));
 
                         // 确保解压路径在目标目录内
                         if (!fullPath.StartsWith(extractPath))
                         {
                             LogService.Instance.AddLog("警告", $"检测到潜在的路径遍历攻击: {entry.FullName}");
+                            continue;
+                        }
+
+                        // 检查是否已处理过此路径
+                        if (processedPaths.Contains(fullPath))
+                        {
                             continue;
                         }
 
@@ -47,15 +56,14 @@ namespace ClipFlow.Clipboard
                         }
                         else // 文件
                         {
-                            // 确保文件的目录存在
-                            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-                            // 解压文件
+                            var dirPath = Path.GetDirectoryName(fullPath)!;
+                            Directory.CreateDirectory(dirPath);
                             entry.ExtractToFile(fullPath, true);
+                            processedPaths.Add(fullPath);
                         }
 
                         // 只处理第一层的路径
-                        var relativePath = entry.FullName.TrimEnd('/');
-                        var pathParts = relativePath.Split('/', '\\');
+                        var pathParts = normalizedEntryName.Split('/', StringSplitOptions.RemoveEmptyEntries);
                         if (pathParts.Length == 1) // 第一层的文件
                         {
                             if (!string.IsNullOrEmpty(entry.Name)) // 是文件
@@ -127,17 +135,17 @@ namespace ClipFlow.Clipboard
                 // 如果有文件，创建必要的文件夹结构
                 foreach (var file in files)
                 {
-                    var relativePath = Path.GetRelativePath(basePath, file);
+                    var relativePath = Path.GetRelativePath(basePath, file).Replace('\\', '/');
                     var dirName = Path.GetDirectoryName(relativePath);
                     
                     if (!string.IsNullOrEmpty(dirName) && !processedDirs.Contains(dirName))
                     {
                         // 创建文件所在的文件夹及其父文件夹
-                        var pathParts = dirName.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                        var pathParts = dirName.Split('/', '\\');
                         var currentPath = "";
                         foreach (var part in pathParts)
                         {
-                            currentPath = string.IsNullOrEmpty(currentPath) ? part : Path.Combine(currentPath, part);
+                            currentPath = string.IsNullOrEmpty(currentPath) ? part : currentPath + "/" + part;
                             if (!processedDirs.Contains(currentPath))
                             {
                                 archive.CreateEntry(currentPath + "/");
@@ -153,7 +161,7 @@ namespace ClipFlow.Clipboard
             else
             {
                 // 如果是空文件夹，只创建一个文件夹条目
-                var relativePath = Path.GetRelativePath(basePath, dirPath);
+                var relativePath = Path.GetRelativePath(basePath, dirPath).Replace('\\', '/');
                 if (!processedDirs.Contains(relativePath))
                 {
                     archive.CreateEntry(relativePath + "/");

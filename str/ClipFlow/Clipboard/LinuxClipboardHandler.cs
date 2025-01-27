@@ -33,7 +33,14 @@ namespace ClipFlow.Clipboard
                   desktop.MainWindow?.Clipboard != null)
                 {
                     var provider = desktop.MainWindow.StorageProvider;
-                    foreach (var path in pathList.Skip(1).Select(v => { return (new System.Uri(v)).LocalPath; }))
+                    var ph = pathList.Skip(1).Select(v =>
+                    {
+                        try { return new System.Uri(v).LocalPath; }
+                        catch { }
+                        return "";
+                    })
+                    .Where(x => !string.IsNullOrEmpty(x));
+                    foreach (var path in ph)
                     {
                         IStorageItem? item = null;
                         if (System.IO.Directory.Exists(path))
