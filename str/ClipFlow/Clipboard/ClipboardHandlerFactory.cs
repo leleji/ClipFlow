@@ -7,15 +7,15 @@ namespace ClipFlow.Clipboard
     {
         public static IClipboardHandler Create()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
             {
                 return new WindowsClipboardHandler();
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else if (OperatingSystem.IsMacOS())
             {
                 return new MacOSClipboardHandler();
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            else if (OperatingSystem.IsLinux())
             {
                 return new LinuxClipboardHandler();
             }
