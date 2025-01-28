@@ -8,6 +8,7 @@ using ClipFlow.Models;
 using ClipFlow.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,7 @@ namespace ClipFlow.Clipboard
                             var text = System.Text.Encoding.UTF8.GetString(data.Data);
                             await clipboard.SetTextAsync(text);
                             _lastHash = ClipboardUtils.GetMd5Hash(text);
+                            data.Description  = "文本: " + (text.Length > 30 ? text[..30] + "..." : text);
                             LogService.Instance.AddLog("已接收", data.Description);
                             break;
 
@@ -65,6 +67,7 @@ namespace ClipFlow.Clipboard
                         case ClipboardType.FileList:
                             if (data.FilenameList.Count > 0)
                             {
+                                data.Description = $"{data.FilenameList.Count} 个文件: {string.Join(", ",  data.FilenameList.Select(path => Path.GetFileName(path.TrimEnd('\\'))).Take(5))}";
                                 var dataObject = await SetStorageItemsToClipboard(data);
                                 if (dataObject!=null)
                                 {

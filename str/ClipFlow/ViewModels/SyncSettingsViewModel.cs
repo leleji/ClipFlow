@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Net.Http.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ClipFlow.ViewModels
 {
@@ -288,8 +289,8 @@ namespace ClipFlow.ViewModels
                                 return;
                             }
                         }
+                       
                         await DownloadFile(data);
-                        data.Description = $"{data.FilenameList.Count} 个文件: {string.Join(", ", data.FilenameList)}";
                         break;
                 }
 

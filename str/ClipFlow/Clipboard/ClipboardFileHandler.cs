@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClipFlow.Clipboard
 {
@@ -50,7 +51,7 @@ namespace ClipFlow.Clipboard
                 FilenameList = items.Select(v => v.Path.LocalPath).ToList(),
                 Filename = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
                 DataLength = totalSize,
-                Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(v => v.Name))}"
+                Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(path => Path.GetFileName(path.Path.LocalPath.TrimEnd('\\'))).Take(5))}"
             };
         }
     }
