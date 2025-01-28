@@ -29,6 +29,7 @@
 									Description="收到服务器更新时候发起通知">
 					<controls:SettingItem.ActionContent>
 						<ToggleSwitch IsChecked="{Binding EnableDownloadNotification}"
+									  IsEnabled="{Binding EnableDownload}"
 									OnContent=""
 									OffContent=""
 									Margin="0,-6,0,-6"/>

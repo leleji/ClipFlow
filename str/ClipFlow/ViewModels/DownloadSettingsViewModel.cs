@@ -37,7 +37,7 @@ namespace ClipFlow.ViewModels
             EnableDownloadImage = _configService.CurrentConfig.EnableDownloadImage;
             EnableDownloadFile = _configService.CurrentConfig.EnableDownloadFile;
             MaxDownloadFileSize = _configService.CurrentConfig.MaxDownloadFileSize;
-            _enableDownloadNotification = _configService.CurrentConfig.EnableDownloadNotification;
+            EnableDownloadNotification = _configService.CurrentConfig.EnableDownloadNotification;
         }
 
         partial void OnEnableDownloadChanged(bool value)

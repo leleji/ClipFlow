@@ -29,7 +29,8 @@
 					Description="在向服务器上传剪贴板内容的时候通知">
 					<controls:SettingItem.ActionContent>
 						<ToggleSwitch IsChecked="{Binding EnableUploadNotification}"
-									OnContent=""
+									IsEnabled="{Binding EnableUpload}"
+									 OnContent=""
 									OffContent=""
 									Margin="0,-6,0,-6"/>
 					</controls:SettingItem.ActionContent>

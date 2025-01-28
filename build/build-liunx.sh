@@ -4,6 +4,10 @@
 rm -rf ./out/
 rm -rf ./staging_folder/
 
+mkdir ./out
+mkdir ./out/linux-x64
+
+
 # .NET 发布
 # 推荐使用 self-contained 发布，这样用户不需要安装 .NET运行时
 dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
