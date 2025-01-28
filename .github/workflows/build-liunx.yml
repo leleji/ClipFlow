@@ -14,51 +14,120 @@ jobs:
   build-and-package:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        config:
-          - { arch: x64, build_type: self-contained, package_type: AppImage, extension: .AppImage }
-          - { arch: x64, build_type: self-contained, package_type: rpm, extension: .rpm }
-          - { arch: x64, build_type: self-contained, package_type: deb, extension: .deb }
-          - { arch: x64, build_type: no-self-contained, package_type: AppImage, extension: .AppImage }
-          - { arch: x64, build_type: no-self-contained, package_type: rpm, extension: .rpm }
-          - { arch: x64, build_type: no-self-contained, package_type: deb, extension: .deb }
-          - { arch: arm64, build_type: self-contained, package_type: AppImage, extension: .AppImage }
-          - { arch: arm64, build_type: self-contained, package_type: deb, extension: .deb }
-          - { arch: arm64, build_type: no-self-contained, package_type: AppImage, extension: .AppImage }
-          - { arch: arm64, build_type: no-self-contained, package_type: deb, extension: .deb }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Publish .NET application (linux-x64)
+        run: |
+          mkdir -p ./out/linux-x64
+          dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
+            --verbosity quiet \
+            --nologo \
+            --configuration Release \
+            --self-contained true \
+            --runtime linux-x64 \
+            --output "./out/linux-x64"
+
+      - name: Publish .NET application (linux-arm64)
+        run: |
+          mkdir -p ./out/linux-arm64
+          dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
+            --verbosity quiet \
+            --nologo \
+            --configuration Release \
+            --self-contained true \
+            --runtime linux-arm64 \
+            --output "./out/linux-arm64"
+
+      - name: Prepare staging folder (linux-x64)
+        run: |
+          mkdir -p staging_folder_x64/DEBIAN
+          cp ./build/control ./staging_folder_x64/DEBIAN
+
+          mkdir -p staging_folder_x64/usr/lib/clipflow
+          cp -f -a ./out/linux-x64/. ./staging_folder_x64/usr/lib/clipflow/
+          chmod -R a+rX ./staging_folder_x64/usr/lib/clipflow/
+          chmod +x ./staging_folder_x64/usr/lib/clipflow/ClipFlow
+
+          mkdir -p staging_folder_x64/usr/share/applications
+          cp ./build/clipflow.desktop ./staging_folder_x64/usr/share/applications/clipflow.desktop
+
+          mkdir -p staging_folder_x64/usr/share/pixmaps
+          cp ./build/logo.png ./staging_folder_x64/usr/share/pixmaps/clipflow.png
+          chmod 644 staging_folder_x64/usr/share/pixmaps/clipflow.png
+
+          mkdir -p staging_folder_x64/usr/share/icons/hicolor/scalable/apps
+          cp ./build/logo.svg ./staging_folder_x64/usr/share/icons/hicolor/scalable/apps/clipflow.svg
+
+      - name: Prepare staging folder (linux-arm64)
+        run: |
+          mkdir -p staging_folder_arm64/DEBIAN
+          cp ./build/control ./staging_folder_arm64/DEBIAN
+
+          mkdir -p staging_folder_arm64/usr/lib/clipflow
+          cp -f -a ./out/linux-arm64/. ./staging_folder_arm64/usr/lib/clipflow/
+          chmod -R a+rX ./staging_folder_arm64/usr/lib/clipflow/
+          chmod +x ./staging_folder_arm64/usr/lib/clipflow/ClipFlow
+
+          mkdir -p staging_folder_arm64/usr/share/applications
+          cp ./build/clipflow.desktop ./staging_folder_arm64/usr/share/applications/clipflow.desktop
+
+          mkdir -p staging_folder_arm64/usr/share/pixmaps
+          cp ./build/logo.png ./staging_folder_arm64/usr/share/pixmaps/clipflow.png
+          chmod 644 staging_folder_arm64/usr/share/pixmaps/clipflow.png
+
+          mkdir -p staging_folder_arm64/usr/share/icons/hicolor/scalable/apps
+          cp ./build/logo.svg ./staging_folder_arm64/usr/share/icons/hicolor/scalable/apps/clipflow.svg
+
+      - name: Build .deb package (linux-x64)
+        run: dpkg-deb --root-owner-group --build ./staging_folder_x64 ./ClipFlow_${{ inputs.version }}_amd64.deb
+
+      - name: Build .deb package (linux-arm64)
+        run: dpkg-deb --root-owner-group --build ./staging_folder_arm64 ./ClipFlow_${{ inputs.version }}_arm64.deb
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ClipFlow_deb_packages
+          path: |
+            ./ClipFlow_${{ inputs.version }}_amd64.deb
+            ./ClipFlow_${{ inputs.version }}_arm64.deb
+
+  release:
+    needs: build-and-package
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ClipFlow_deb_packages
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
+      - name: Upload to Release (linux-x64)
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ inputs.upload_url }}
+          asset_path: "./ClipFlow_${{ inputs.version }}_amd64.deb"
+          asset_name: "ClipFlow_${{ inputs.version }}_amd64.deb"
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Restore dependencies
-      run: dotnet restore ./str/ClipFlow/ClipFlow.csproj
-
-    - name: Build and Publish
-      run: |
-        echo "Building for linux-${{ matrix.config.arch }} with ${{ matrix.config.build_type }}..."
-        dotnet publish ./str/ClipFlow/ClipFlow.csproj \
-          -c Release \
-          -r linux-${{ matrix.config.arch }} \
-          --${{ matrix.config.build_type }} \
-          -o output/${{ matrix.config.arch }}/${{ matrix.config.build_type }}/${{ matrix.config.package_type }}
-        echo "Publish directory contents:"
-        ls -lR output/${{ matrix.config.arch }}/${{ matrix.config.build_type }}/${{ matrix.config.package_type }}
-        mv output/${{ matrix.config.arch }}/${{ matrix.config.build_type }}/${{ matrix.config.package_type }}/ClipFlow \
-           output/ClipFlow-${{ inputs.version }}-${{ matrix.config.build_type }}-${{ matrix.config.arch }}${{ matrix.config.extension }}
-
-    - name: Upload to Release
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ inputs.upload_url }}
-        asset_path: output/ClipFlow-${{ inputs.version }}-${{ matrix.config.build_type }}-${{ matrix.config.arch }}${{ matrix.config.extension }}
-        asset_name: ClipFlow-${{ inputs.version }}-${{ matrix.config.build_type }}-${{ matrix.config.arch }}${{ matrix.config.extension }}
-        asset_content_type: application/octet-stream
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload to Release (linux-arm64)
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ inputs.upload_url }}
+          asset_path: "./ClipFlow_${{ inputs.version }}_arm64.deb"
+          asset_name: "ClipFlow_${{ inputs.version }}_arm64.deb"
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
