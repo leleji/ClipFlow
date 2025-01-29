@@ -1,0 +1,11 @@
+Package: ClipFlow
+Version: {{VERSION}}
+Section: utils
+Priority: optional
+Architecture: {{ARCH}}
+Installed-Size: {{SIZE}}
+Depends: libx11-6, libice6, libsm6, libfontconfig1
+Maintainer: leleji
+Homepage: https://github.com/leleji/ClipFlow
+Description: ClipFlow - A powerful clipboard synchronization tool.
+Copyright: 2025-2025 leleji

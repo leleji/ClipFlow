@@ -1,0 +1,66 @@
+name: build-windows
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      upload_url:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        arch: [win-x64, win-arm64]  # 定义两个架构
+        self_contained: [true, false]  # 定义是否为 self-contained
+
+    env:
+      Solution_Name: str/ClipFlow/ClipFlow.csproj
+      Configuration: Release
+
+    steps:
+    # 检出代码
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # 设置 .NET SDK
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ./str/ClipFlow/ClipFlow.csproj
+
+    # 发布应用程序
+    - name: Publish Application
+      run: |
+        dotnet publish $env:Solution_Name --configuration $env:Configuration --self-contained ${{ matrix.self_contained }} --output ./publish/${{ matrix.arch }}-${{ matrix.self_contained }} --runtime ${{ matrix.arch }}
+
+    # 打包发布文件
+    - name: Create ZIP Packages
+      id: create_zip
+      shell: pwsh
+      run: |
+        $runtime = "${{ matrix.arch }}-${{ matrix.self_contained }}"
+        $zipName = "ClipFlow-${{ inputs.version }}-$runtime.zip"
+        Compress-Archive -Path ./publish/$runtime/* -DestinationPath ./$zipName -Force
+        echo "zip_path_$($runtime.Replace('-', '_'))=$zipName" >> $env:GITHUB_ENV
+
+    # 上传 Release Asset
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ inputs.upload_url }}
+        asset_path: "./ClipFlow-${{ inputs.version }}-${{ matrix.arch }}-${{ matrix.self_contained }}.zip"
+        asset_name: "ClipFlow-${{ inputs.version }}-${{ matrix.arch }}-${{ matrix.self_contained && 'self-contained' || '' }}.zip"
+        asset_content_type: application/zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ClipFlow.ViewModels"
+             xmlns:controls="using:ClipFlow.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ClipFlow.Views.SyncSettingsPage"
+             x:DataType="vm:SyncSettingsViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                 VerticalScrollBarVisibility="Auto"
+                 Margin="0,0,8,0">
+        <StackPanel Spacing="20" Margin="30,0,22,0">
+            <controls:SettingItem Title="启用剪贴板同步"
+								
+                                 Description="{Binding ServerStatus}">
+                <controls:SettingItem.ActionContent>
+                    <ToggleSwitch IsChecked="{Binding IsEnabled}"
+                                 OnContent=""
+                                 OffContent=""
+                                 Margin="0,-6,0,-6"/>
+                </controls:SettingItem.ActionContent>
+            </controls:SettingItem>
+			<controls:CardExpander Header="服务器配置" IsExpanded="True">
+				<controls:CardExpander.CardContent >
+					<StackPanel >
+						<controls:SettingItem Title="Api地址"
+										BackgroundColor="Transparent"
+											 BorderThickness="0,0,0,0"
+											  CornerRadius="0"
+											 Description="服务器地址">
+							<controls:SettingItem.ActionContent>
+								<TextBox 
+								   Text="{Binding Host}"
+								   Watermark="例如：https://www.ClipFlow.com:7145/"/>
+							</controls:SettingItem.ActionContent>
+						</controls:SettingItem>
+						<controls:SettingItem Title="Token"
+											  BackgroundColor="Transparent"
+											  BorderThickness="0,1,0,0"
+                      CornerRadius="0"
+					 Description="服务器认证的Token">
+							<controls:SettingItem.ActionContent>
+								<TextBox
+							   Text="{Binding Token}"
+							   PasswordChar="●"
+							   Watermark=""/>
+							</controls:SettingItem.ActionContent>
+						</controls:SettingItem>
+						<controls:SettingItem Title="用户Key"
+											  BackgroundColor="Transparent"
+											  BorderThickness="0,1,0,0"
+                      CornerRadius="0"
+					 Description="不同设备设置为相同的key">
+							<controls:SettingItem.ActionContent>
+								<TextBox
+							   Text="{Binding UserKey}"/>
+							</controls:SettingItem.ActionContent>
+						</controls:SettingItem>
+					</StackPanel>
+				</controls:CardExpander.CardContent>
+			</controls:CardExpander>
+
+
+			<Grid Margin="1"></Grid>
+
+		</StackPanel>
+    </ScrollViewer>
+</UserControl> 

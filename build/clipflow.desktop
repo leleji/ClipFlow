@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ClipFlow
+Comment=A simple clipboard manager
+Exec=/usr/lib/clipflow/ClipFlow
+Icon=clipflow
+Terminal=false
+Type=Application
+Categories=Utility;Application;
+StartupNotify=true

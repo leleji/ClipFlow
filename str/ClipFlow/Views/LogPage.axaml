@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ClipFlow.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ClipFlow.Views.LogPage"
+             x:DataType="vm:LogViewModel">
+    <Grid>
+        <Border BorderThickness="1"
+                BorderBrush="{DynamicResource BorderBrushColor}"
+                CornerRadius="4"
+                Background="{DynamicResource BorderBackgroundColor}"
+                Margin="30,0,30,30">
+
+            <ScrollViewer Name="LogScrollViewer"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled">
+                <ItemsRepeater ItemsSource="{Binding LogItems}">
+                    <ItemsRepeater.Layout>
+                        <StackLayout Spacing="5" Orientation="Vertical"/>
+                    </ItemsRepeater.Layout>
+
+                    <ItemsRepeater.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="复制选中" Command="{Binding CopySelectedLogCommand}"/>
+                            <MenuItem Header="复制全部" Command="{Binding CopyAllLogsCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="清空日志" Command="{Binding ClearLogCommand}"/>
+                        </ContextMenu>
+                    </ItemsRepeater.ContextMenu>
+
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="3"
+                                    Background="Transparent"
+                                    PointerPressed="OnLogItemPressed">
+                                <TextBlock TextWrapping="Wrap" MaxWidth="{Binding $parent[ScrollViewer].Bounds.Width}">
+                                    <Run Text="{Binding Timestamp, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" 
+                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).TimestampBrush}"/>
+                                    <Run Text=" "/>
+                                    <Run Text="{Binding Type}" 
+                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).TypeBrush}"/>
+                                    <Run Text=": "/>
+                                    <Run Text="{Binding Message}"
+                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).MessageBrush}"/>
+                                </TextBlock>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl> 

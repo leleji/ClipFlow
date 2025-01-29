@@ -1,0 +1,115 @@
+name: Build and Upload .deb Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Publish .NET application (linux-x64)
+        run: |
+          mkdir -p ./out/linux-x64
+          dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
+            --verbosity quiet \
+            --nologo \
+            --configuration Release \
+            --self-contained true \
+            --runtime linux-x64 \
+            --output "./out/linux-x64"
+
+      - name: Publish .NET application (linux-arm64)
+        run: |
+          mkdir -p ./out/linux-arm64
+          dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
+            --verbosity quiet \
+            --nologo \
+            --configuration Release \
+            --self-contained true \
+            --runtime linux-arm64 \
+            --output "./out/linux-arm64"
+
+      - name: Prepare staging folder (linux-x64)
+        run: |
+          mkdir -p staging_folder_x64/DEBIAN
+          cp ./build/control ./staging_folder_x64/DEBIAN
+
+          mkdir -p staging_folder_x64/usr/lib/clipflow
+          cp -f -a ./out/linux-x64/. ./staging_folder_x64/usr/lib/clipflow/
+          chmod -R a+rX ./staging_folder_x64/usr/lib/clipflow/
+          chmod +x ./staging_folder_x64/usr/lib/clipflow/ClipFlow
+
+          mkdir -p staging_folder_x64/usr/share/applications
+          cp ./build/clipflow.desktop ./staging_folder_x64/usr/share/applications/clipflow.desktop
+
+          mkdir -p staging_folder_x64/usr/share/pixmaps
+          cp ./build/logo.png ./staging_folder_x64/usr/share/pixmaps/clipflow.png
+          chmod 644 staging_folder_x64/usr/share/pixmaps/clipflow.png
+
+          mkdir -p staging_folder_x64/usr/share/icons/hicolor/scalable/apps
+          cp ./build/logo.svg ./staging_folder_x64/usr/share/icons/hicolor/scalable/apps/clipflow.svg
+
+      - name: Prepare staging folder (linux-arm64)
+        run: |
+          mkdir -p staging_folder_arm64/DEBIAN
+          cp ./build/control ./staging_folder_arm64/DEBIAN
+
+          mkdir -p staging_folder_arm64/usr/lib/clipflow
+          cp -f -a ./out/linux-arm64/. ./staging_folder_arm64/usr/lib/clipflow/
+          chmod -R a+rX ./staging_folder_arm64/usr/lib/clipflow/
+          chmod +x ./staging_folder_arm64/usr/lib/clipflow/ClipFlow
+
+          mkdir -p staging_folder_arm64/usr/share/applications
+          cp ./build/clipflow.desktop ./staging_folder_arm64/usr/share/applications/clipflow.desktop
+
+          mkdir -p staging_folder_arm64/usr/share/pixmaps
+          cp ./build/logo.png ./staging_folder_arm64/usr/share/pixmaps/clipflow.png
+          chmod 644 staging_folder_arm64/usr/share/pixmaps/clipflow.png
+
+          mkdir -p staging_folder_arm64/usr/share/icons/hicolor/scalable/apps
+          cp ./build/logo.svg ./staging_folder_arm64/usr/share/icons/hicolor/scalable/apps/clipflow.svg
+
+      - name: Build .deb package (linux-x64)
+        run: dpkg-deb --root-owner-group --build ./staging_folder_x64 ./ClipFlow_1.0.0_amd64.deb
+
+      - name: Build .deb package (linux-arm64)
+        run: dpkg-deb --root-owner-group --build ./staging_folder_arm64 ./ClipFlow_1.0.0_arm64.deb
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ClipFlow_deb_packages
+          path: |
+            ./ClipFlow_1.0.0_amd64.deb
+            ./ClipFlow_1.0.0_arm64.deb
+
+  release:
+    needs: build-and-package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ClipFlow_deb_packages
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ClipFlow_1.0.0_amd64.deb
+            ClipFlow_1.0.0_arm64.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

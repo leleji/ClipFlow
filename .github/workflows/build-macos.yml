@@ -1,0 +1,99 @@
+name: build-macos
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      upload_url:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]  # 定义两个架构
+        self_contained: [true, false]  # 定义是否为 self-contained
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./str/ClipFlow/ClipFlow.csproj
+
+
+    - name: Publish the project
+      run: |
+        output_dir="./publish/osx-${{ matrix.arch }}-${{ matrix.self_contained }}"
+        sc_flag="--self-contained ${{ matrix.self_contained }}"
+        dotnet publish ./str/ClipFlow/ClipFlow.csproj \
+          -c Release \
+          -o $output_dir \
+          -r osx-${{ matrix.arch }} \
+          $sc_flag
+
+    - name: Create .app
+      run: |
+        # 创建 .app 结构
+        mkdir -p ClipFlow.app/Contents/{MacOS,Resources}
+
+        # 复制可执行文件
+        cp -r ./publish/osx-${{ matrix.arch }}-${{ matrix.self_contained }}/* ClipFlow.app/Contents/MacOS/
+
+        # 复制项目目录中的 Info.plist
+        cp ./build/Info.plist ClipFlow.app/Contents/
+
+        # 复制图标文件（如果有）
+        cp ./build/logo.icns ClipFlow.app/Contents/Resources/
+
+        # 设置可执行权限
+        chmod +x ClipFlow.app/Contents/MacOS/ClipFlow
+
+    # 安装 create-dmg
+    - name: Install create-dmg
+      run: |
+        brew install create-dmg
+
+    # 创建 .dmg 文件
+    - name: Create .dmg
+      run: |
+        # 创建临时目录
+        mkdir -p dist
+
+        # 复制 .app 到临时目录
+        cp -r ClipFlow.app dist/
+
+        # 创建 .dmg 文件
+        create-dmg \
+          --window-size 660 400 \
+          --icon-size 120 \
+          --icon ClipFlow.app 165 175 \
+          --app-drop-link 495 175 \
+          ClipFlow-${{ matrix.arch }}.dmg dist/
+
+        # 清理临时目录
+        rm -rf dist
+        
+    # 使用版本号
+    - name: Use Version
+      run: |
+        echo "The version is ${{ inputs.version }}"
+        
+    # 上传 Release Asset
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ inputs.upload_url }}
+        asset_path: "./ClipFlow-${{ matrix.arch }}.dmg"
+        asset_name: "ClipFlow-${{ inputs.version }}-osx-${{ matrix.arch }}${{ matrix.self_contained && '-self-contained' || '' }}.dmg"
+        asset_content_type: application/x-apple-diskimage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

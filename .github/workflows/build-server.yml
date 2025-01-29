@@ -1,0 +1,94 @@
+name: build-server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 检出代码
+    - uses: actions/checkout@v4
+
+    # 设置 .NET 环境
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 确定版本号  
+    - name: Read project version
+      id: get-version
+      run: |
+        version=$(grep -oP '(?<=<Version>).*?(?=</Version>)' str/ClipFlow.Api/ClipFlow.Api.csproj)
+        if [ -z "$version" ]; then
+          echo "Error: Unable to read version from ClipFlow.Api.csproj"
+          exit 1
+        fi
+        echo "version=$version" >> $GITHUB_ENV
+        echo "Version: $version"
+
+    # 恢复依赖
+    - name: Restore dependencies
+      run: dotnet restore ./str/ClipFlow.Api/ClipFlow.Api.csproj
+
+    # 发布应用程序
+    - name: Publish Application
+      run: dotnet publish ./str/ClipFlow.Api/ClipFlow.Api.csproj -c Release -o publish
+
+    # 创建 ZIP 包
+    - name: Create ZIP package
+      run: |
+        cd publish
+        zip -r ../ClipFlow-${{ env.version }}.zip .
+
+    # # 创建 GitHub Release
+    # - name: Create GitHub Release
+    #   id: create_release
+    #   uses: actions/create-release@v1
+    #   with:
+    #     tag_name: v${{ env.version }}
+    #     release_name: ClipFlow v${{ env.version }}
+    #     body: TODO New Release.
+    #     draft: false
+    #     prerelease: false
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # 上传 ZIP 文件到 GitHub Release 
+    # - name: Upload ZIP to GitHub Release
+    #   uses: actions/upload-release-asset@v1
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ClipFlow-${{ env.version }}.zip
+    #     asset_name: ClipFlow-${{ env.version }}.zip
+    #     asset_content_type: application/zip
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # 登录 Docker Hub（使用 Token 认证）
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}  # 使用 Token 代替密码
+
+    # 设置 Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        driver: docker-container
+
+    # 构建和推送多架构 Docker 镜像
+    - name: Build and Push Multi-Arch Docker Image
+      run: |
+        docker buildx build \
+          --no-cache \
+          --platform linux/amd64,linux/arm64 \
+          -t ${{ secrets.DOCKER_USERNAME }}/clipflow-server:${{ env.version }} \
+          -t ${{ secrets.DOCKER_USERNAME }}/clipflow-server:latest \
+          -f ./str/ClipFlow.Api/Dockerfile \
+          --push .
+
+    

@@ -1,0 +1,88 @@
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Get Version
+      id: version
+      run: |
+        csprojPath="./str/ClipFlow/ClipFlow.csproj"
+        if [ -f "$csprojPath" ]; then
+          version=$(grep -oP '<Version>\K[^<]+' "$csprojPath")
+          if [ -n "$version" ]; then
+            echo "version=$version" >> $GITHUB_ENV  # 输出给 GitHub 环境变量
+            echo "version=$version" >> $GITHUB_OUTPUT  # 输出给任务 outputs
+          else
+            echo "Version not found in $csprojPath"
+            exit 1
+          fi
+        else
+          echo "ClipFlow.csproj not found at $csprojPath"
+          exit 1
+        fi
+    # 使用版本号
+    - name: Use Version
+      run: |
+        echo "The version is ${{ env.version }}"
+
+    - name: Read releases.md
+      id: read_releases
+      run: |
+        RELEASES_CONTENT=$(cat releases.md)
+        # 将内容中的换行符替换为实际的换行符
+        RELEASES_CONTENT="${RELEASES_CONTENT//'%'/'%25'}"
+        RELEASES_CONTENT="${RELEASES_CONTENT//$'\n'/'%0A'}"
+        RELEASES_CONTENT="${RELEASES_CONTENT//$'\r'/'%0D'}"
+        echo "::set-output name=releases_content::${RELEASES_CONTENT}"
+
+    # 创建 GitHub Release   
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: v${{ env.version }}
+        release_name: ClipFlow v${{ env.version }}
+        body: ${{ steps.read_releases.outputs.releases_content }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+    # 设置任务输出
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      upload_url:  ${{ steps.create_release.outputs.upload_url }}
+
+  build-macos:
+    needs: build  # 依赖 build 任务
+    uses: ./.github/workflows/build-macos.yml  # 使用当前仓库的 build-macos.yml
+    with:
+      version: ${{ needs.build.outputs.version }}  # 传递 version 参数
+      upload_url: ${{ needs.build.outputs.upload_url }}  # 如果需要，传递 upload_url
+
+  build-windows:
+    needs: build  # 依赖 build 任务
+    uses: ./.github/workflows/build-windows.yml  # 使用当前仓库的 build-windows.yml 
+    with:
+      version: ${{ needs.build.outputs.version }}  # 传递 version 参数
+      upload_url: ${{ needs.build.outputs.upload_url }}  # 如果需要，传递 upload_url
+  
+  build-liunx:
+    needs: build  # 依赖 build 任务
+    uses: ./.github/workflows/build-liunx.yml  # 使用当前仓库的 build-liunx.yml 
+    with:
+      version: ${{ needs.build.outputs.version }}  # 传递 version 参数
+      upload_url: ${{ needs.build.outputs.upload_url }}  # 如果需要，传递 upload_url
+  

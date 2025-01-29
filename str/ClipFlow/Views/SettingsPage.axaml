@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ClipFlow.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="using:ClipFlow.Controls"
+			 x:Class="ClipFlow.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel">
+	<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+			 VerticalScrollBarVisibility="Auto"
+			 Margin="0,0,8,0">
+		<StackPanel Spacing="20" Margin="30,0,22,0">
+			<controls:SettingItem Title="自动启动"
+                                 Description="开机时自动启动程序">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding AutoStart}"
+                                 OnContent=""
+                                 OffContent=""
+                                 Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+
+			<controls:SettingItem Title="最小化到托盘"
+                                 Description="关闭窗口时最小化到系统托盘">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding MinimizeToTray}"
+                                 OnContent=""
+                                 OffContent=""
+                                 Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+			<controls:SettingItem Title="主题模式"
+                                 Description="设置应用的主题模式">
+				<controls:SettingItem.ActionContent>
+					<ComboBox SelectedIndex="{Binding ThemeMode}"
+                              MinWidth="120"
+                              VerticalAlignment="Center">
+						<ComboBoxItem>跟随系统</ComboBoxItem>
+						<ComboBoxItem>浅色模式</ComboBoxItem>
+						<ComboBoxItem>深色模式</ComboBoxItem>
+					</ComboBox>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+			<controls:SettingItem Title="启动时隐藏窗口"
+                                 Description="启动后自动最小化到系统托盘">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding HideOnStartup}"
+                                 OnContent=""
+                                 OffContent=""
+                                 Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>
