@@ -17,7 +17,7 @@ namespace ClipFlow.Clipboard
 
         protected override async Task<IEnumerable<IStorageItem>?> GetStorageItemsFromClipboard(IClipboard clipboard)
         {
-            return await clipboard.GetDataAsync(FileFormat) as IEnumerable<IStorageItem>;
+            return await clipboard.GetDataAsync("Files") as IEnumerable<IStorageItem>;
         }
 
         protected override async Task<DataObject?> SetStorageItemsToClipboard(ClipboardData data)

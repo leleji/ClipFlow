@@ -68,8 +68,6 @@ brew install dotnet-sdk
 ### 注意：
 - 删除软件时，配置文件目录不会被删除，配置文件储存在`~/.config/ClipFlow/`(Linux)，`~/Library/Application Support/ClipFlow/`(macOS)，需要彻底删除软件时请手动删除整个目录
 - 使用`deb`、`rpm`安装包时，每次更新版本需要先删除旧版，再安装新版，不支持直接更新
-- Linux: 快捷键在Wayland不可用
-- Linux: 无法自动识别语言，默认为英语
 - macOS: `“ClipFlow”已损坏，无法打开`，在终端中执行`sudo xattr -d com.apple.quarantine /Applications/ClipFlow.app`
 
 ### 客户端配置说明

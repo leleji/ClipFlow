@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+	<TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -10,10 +10,28 @@
     <RootNamespace>ClipFlow</RootNamespace>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
-	<Version>0.0.1</Version>
+	<RuntimeIdentifiers>win-x86;win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
+	<Version>0.0.2</Version>
   </PropertyGroup>
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'">
+		<UseAppHost>true</UseAppHost>
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>true</SelfContained>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<PublishReadyToRun>true</PublishReadyToRun>
+		<EnableMacOSBundle>true</EnableMacOSBundle>
+		<MacOSBundleName>ClipFlow</MacOSBundleName>
+		<MacOSBundleIdentifier>com.yourcompany.ClipFlow</MacOSBundleIdentifier>
+		<MacOSBundleIcon>../../build/logo.icns</MacOSBundleIcon>
+		<MacOSBundleInfoPlist>../../build/Info.plist</MacOSBundleInfoPlist>
+		<CFBundleShortVersionString>0.0.1</CFBundleShortVersionString>
+		<!-- 添加这一行 -->
+		<CFBundleVersion>0.0.1</CFBundleVersion>
+		<!-- 可选，如果有必要 -->
+	</PropertyGroup>
 
-  <ItemGroup>
+
+	<ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
@@ -30,6 +48,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="WindowsContracts.Net.Foundation.UniversalApiContract" Version="5.19041.10" />
   </ItemGroup>
