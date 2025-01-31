@@ -8,8 +8,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\ClipFlow\ClipFlow.Desktop.csproj" />
+    <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />
   </ItemGroup>
 </Project>
