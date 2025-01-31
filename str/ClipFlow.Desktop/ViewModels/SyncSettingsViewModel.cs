@@ -14,7 +14,7 @@ using System.IO.Compression;
 using System.Threading;
 using System.Net.Http.Json;
 using static System.Net.Mime.MediaTypeNames;
-using ClipFlow.Desktop.Notification;
+using ClipFlow.Services;
 
 namespace ClipFlow.Desktop.ViewModels
 {

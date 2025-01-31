@@ -1,28 +1,25 @@
-﻿using System;
 using Avalonia;
 using Avalonia.Media;
-using ClipFlow.Desktop.Win.Notification;
+using System;
+using ClipFlow.Desktop.Linux.Notification;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Services;
 
-namespace ClipFlow.Desktop.Win;
+namespace ClipFlow.Desktop.Linux;
 
 class Program
 {
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args)
     {
         try
         {
-            // 注册 Windows 通知服务
-            var notificationService = new WindowsNotificationService();
+            // 注册 Linux 通知服务
+            var notificationService = new LinuxNotificationService();
             notificationService.Initialize();
             NotificationService.RegisterPlatformService(notificationService);
             
-            FileLogService._.Info("Windows通知服务注册成功");
+            FileLogService._.Info("Linux通知服务注册成功");
         }
         catch (Exception ex)
         {
@@ -33,7 +30,6 @@ class Program
             .StartWithClassicDesktopLifetime(args);
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
@@ -44,12 +40,11 @@ class Program
                 DefaultFamilyName = "avares://Avalonia.Fonts.Inter/Assets#Inter",
                 FontFallbacks = new[]
                 {
-                        new FontFallback { FontFamily = "Microsoft YaHei UI" },
-                        new FontFallback { FontFamily = "Noto Sans CJK SC" },
-                        new FontFallback { FontFamily = "PingFang SC" },
-                        new FontFallback { FontFamily = "Source Han Sans SC" },
-                        new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
+                    new FontFallback { FontFamily = "Microsoft YaHei UI" },
+                    new FontFallback { FontFamily = "Noto Sans CJK SC" },
+                    new FontFallback { FontFamily = "PingFang SC" },
+                    new FontFallback { FontFamily = "Source Han Sans SC" },
+                    new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
                 }
             });
-
-}
+} 

@@ -2,10 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using ClipFlow.Desktop.Services;
+using ClipFlow.Interfaces;
+using ClipFlow.Services;
 
-namespace ClipFlow.Desktop.Notification
+namespace ClipFlow.Desktop.MacOs.Notification
 {
-    public class MacOSNotificationService : INotificationService
+    public class MacOSNotificationService : INotification
     {
         private bool _isInitialized;
         private const string APP_NAME = "ClipFlow";
@@ -14,7 +16,6 @@ namespace ClipFlow.Desktop.Notification
         {
             try
             {
-                // 检查osascript是否可用
                 using var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = "osascript",
@@ -64,14 +65,12 @@ namespace ClipFlow.Desktop.Notification
 
             try
             {
-                // 转义特殊字符
                 var escapedTitle = title.Replace("\"", "\\\"").Replace("'", "\\'");
                 var escapedMessage = message.Replace("\"", "\\\"").Replace("'", "\\'");
 
-                // 构建更丰富的通知脚本
                 var script = $@"
                     display notification ""{escapedMessage}"" with title ""{APP_NAME}"" subtitle ""{escapedTitle}""
-                    sound name ""Submarine""  -- 添加提示音
+                    sound name ""Submarine""
                 ";
 
                 using var process = Process.Start(new ProcessStartInfo
@@ -110,8 +109,7 @@ namespace ClipFlow.Desktop.Notification
 
         public void Dispose()
         {
-            // macOS通知不需要特别的清理
             _isInitialized = false;
         }
     }
-}
+} 

@@ -1,28 +1,28 @@
 using System;
 using System.Threading.Tasks;
-using Windows.UI.Notifications;
-using Windows.Data.Xml.Dom;
+using Microsoft.Toolkit.Uwp.Notifications;
 using System.Runtime.Versioning;
 using Avalonia.Threading;
 using ClipFlow.Desktop.Services;
+using ClipFlow.Services;
+using ClipFlow.Interfaces;
 
-namespace ClipFlow.Desktop.Notification
+namespace ClipFlow.Desktop.Win.Notification
 {
-    [SupportedOSPlatform("windows10.0.10240")]
-    public class WindowsNotificationService : INotificationService
+    [SupportedOSPlatform("windows10.0.19041.0")]
+    public class WindowsNotificationService : INotification
     {
-        private ToastNotifier? _notifier;
         private bool _isInitialized;
+        private const string APP_NAME = "ClipFlow";
 
         public void Initialize()
         {
             try
             {
-                _notifier = ToastNotificationManager.CreateToastNotifier("ClipFlow");
-
+                // 清理旧通知
                 try
                 {
-                    ToastNotificationManager.History.Clear();
+                    ToastNotificationManagerCompat.History.Clear();
                 }
                 catch (Exception ex)
                 {
@@ -30,6 +30,7 @@ namespace ClipFlow.Desktop.Notification
                 }
 
                 _isInitialized = true;
+                FileLogService._.Info("Windows通知服务初始化成功");
             }
             catch (Exception ex)
             {
@@ -39,7 +40,7 @@ namespace ClipFlow.Desktop.Notification
 
         public async Task ShowNotificationAsync(string title, string message)
         {
-            if (!_isInitialized || _notifier == null)
+            if (!_isInitialized)
             {
                 FileLogService._.Error("通知服务未初始化");
                 return;
@@ -49,17 +50,13 @@ namespace ClipFlow.Desktop.Notification
             {
                 try
                 {
-                    var template = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
-                    var textNodes = template.GetElementsByTagName("text");
-                    textNodes[0].AppendChild(template.CreateTextNode(title));
-                    textNodes[1].AppendChild(template.CreateTextNode(message));
-
-                    var toast = new ToastNotification(template)
-                    {
-                        ExpirationTime = DateTime.Now.AddSeconds(5)
-                    };
-
-                    _notifier.Show(toast);
+                    new ToastContentBuilder()
+                        .AddText(title)
+                        .AddText(message)
+                        .Show(toast =>
+                        {
+                            toast.ExpirationTime = DateTime.Now.AddSeconds(5);
+                        });
                 }
                 catch (Exception ex)
                 {
@@ -72,12 +69,19 @@ namespace ClipFlow.Desktop.Notification
         {
             try
             {
-                ToastNotificationManager.History.Clear();
+                if (_isInitialized)
+                {
+                    ToastNotificationManagerCompat.History.Clear();
+                }
             }
             catch (Exception ex)
             {
                 FileLogService._.Error("清理 Windows 通知失败", ex);
             }
+            finally
+            {
+                _isInitialized = false;
+            }
         }
     }
-}
+} 

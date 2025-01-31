@@ -6,9 +6,9 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <AssemblyName>ClipFlow</AssemblyName>
-    <RootNamespace>ClipFlow</RootNamespace>
-    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
+    <AssemblyName>ClipFlow.Desktop</AssemblyName>
+    <RootNamespace>ClipFlow.Desktop</RootNamespace>
+    
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	<RuntimeIdentifiers>win-x86;win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
 	<Version>0.0.2</Version>
@@ -50,7 +50,6 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
     <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="WindowsContracts.Net.Foundation.UniversalApiContract" Version="5.19041.10" />
   </ItemGroup>
 
   <ItemGroup>

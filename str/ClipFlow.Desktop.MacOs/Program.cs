@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using System;
+using ClipFlow.Desktop.MacOs.Notification;
+using ClipFlow.Services;
 
 namespace ClipFlow.Desktop.MacOs;
 
@@ -10,8 +12,16 @@ class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static void Main(string[] args)
+    {
+        // 注册 MacOS 通知服务
+        var notificationService = new Notification.MacOSNotificationService();
+        notificationService.Initialize();
+        NotificationService.RegisterPlatformService(notificationService);
+
+        BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
+    }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()

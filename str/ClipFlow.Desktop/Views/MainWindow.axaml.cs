@@ -54,7 +54,7 @@ namespace ClipFlow.Desktop.Views
             menu.Add(exitItem);
 
             // 使用资源路径加载图标
-            var uri = new Uri("avares://ClipFlow/Assets/trayiicon.ico");
+            var uri = new Uri("avares://ClipFlow.Desktop/Assets/trayiicon.ico");
             _trayIcon = new TrayIcon
             {
                 Icon = new WindowIcon(AssetLoader.Open(uri)),
