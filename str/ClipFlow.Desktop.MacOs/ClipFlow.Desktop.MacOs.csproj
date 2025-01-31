@@ -7,8 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\ClipFlow\ClipFlow.Desktop.csproj" />
+    <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />
   </ItemGroup>
 </Project>

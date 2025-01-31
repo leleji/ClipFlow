@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop", "ClipFlow\ClipFlow.Desktop.csproj", "{36907B2A-60D2-4279-B4B7-F29DC0C0D1BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop", "ClipFlow.Desktop\ClipFlow.Desktop.csproj", "{36907B2A-60D2-4279-B4B7-F29DC0C0D1BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Api", "ClipFlow.Api\ClipFlow.Api.csproj", "{698E6B2C-008D-4B76-AF3F-D713DA8B3BC9}"
 EndProject
@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Models", "ClipFlow
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.Win", "ClipFlow.Desktop.Win\ClipFlow.Desktop.Win.csproj", "{91B856A3-19F0-447E-A61F-877082E2D50E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipFlow.Desktop.MacOs", "ClipFlow.Desktop.Mac\ClipFlow.Desktop.MacOs.csproj", "{CD1336FC-94E8-40D6-9248-012F23A55DD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipFlow.Desktop.MacOs", "ClipFlow.Desktop.MacOs\ClipFlow.Desktop.MacOs.csproj", "{CD1336FC-94E8-40D6-9248-012F23A55DD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
