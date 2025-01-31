@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace ClipFlow.Controls
+namespace ClipFlow.Desktop.Controls
 {
     public class RotateConverter : IValueConverter
     {

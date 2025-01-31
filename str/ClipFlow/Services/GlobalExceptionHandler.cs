@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public static class GlobalExceptionHandler
     {

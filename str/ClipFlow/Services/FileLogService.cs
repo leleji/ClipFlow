@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public class FileLogService
     {

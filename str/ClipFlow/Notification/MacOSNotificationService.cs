@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Notification
+namespace ClipFlow.Desktop.Notification
 {
     public class MacOSNotificationService : INotificationService
     {

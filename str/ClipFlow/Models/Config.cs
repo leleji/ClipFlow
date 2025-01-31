@@ -1,4 +1,4 @@
-namespace ClipFlow.Models
+namespace ClipFlow.Desktop.Models
 {
     public class Config
     {

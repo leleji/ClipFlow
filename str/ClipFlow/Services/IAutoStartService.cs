@@ -1,4 +1,4 @@
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public interface IAutoStartService
     {

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.Win32;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public class AutoStartService : IAutoStartService
     {

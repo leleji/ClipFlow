@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 
-namespace ClipFlow.Controls
+namespace ClipFlow.Desktop.Controls
 {
     public partial class CardExpander : UserControl
     {

@@ -4,9 +4,9 @@ using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
 using System.Runtime.Versioning;
 using Avalonia.Threading;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Notification
+namespace ClipFlow.Desktop.Notification
 {
     [SupportedOSPlatform("windows10.0.10240")]
     public class WindowsNotificationService : INotificationService

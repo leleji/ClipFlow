@@ -1,7 +1,7 @@
 using ClipFlow.Models;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public interface IClipboardHandler
     {

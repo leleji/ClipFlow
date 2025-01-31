@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.ViewModels
+namespace ClipFlow.Desktop.ViewModels
 {
     public partial class DownloadSettingsViewModel : ViewModelBase
     {

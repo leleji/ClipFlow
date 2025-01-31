@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System;
 using Avalonia.Media;
 
-namespace ClipFlow.ViewModels
+namespace ClipFlow.Desktop.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {

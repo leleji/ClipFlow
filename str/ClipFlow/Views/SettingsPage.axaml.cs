@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace ClipFlow.Views
+namespace ClipFlow.Desktop.Views
 {
     public partial class SettingsPage : UserControl
     {

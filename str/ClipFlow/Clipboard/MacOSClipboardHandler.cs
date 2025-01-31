@@ -5,11 +5,11 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public class MacOSClipboardHandler : BaseClipboardHandler
     {

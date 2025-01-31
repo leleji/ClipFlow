@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ClipFlow.Notification
+namespace ClipFlow.Desktop.Notification
 {
     public interface INotificationService
     {

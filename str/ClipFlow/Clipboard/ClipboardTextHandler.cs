@@ -3,7 +3,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public class ClipboardTextHandler
     {

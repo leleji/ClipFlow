@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ClipFlow.ViewModels
+namespace ClipFlow.Desktop.ViewModels
 {
     public partial class AboutViewModel : ViewModelBase
     {

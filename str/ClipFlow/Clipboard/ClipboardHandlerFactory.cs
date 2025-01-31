@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public static class ClipboardHandlerFactory
     {

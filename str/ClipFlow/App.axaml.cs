@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using ClipFlow.Services;
-using ClipFlow.Views;
+using ClipFlow.Desktop.Services;
+using ClipFlow.Desktop.Views;
 using System.Threading.Tasks;
 using System;
 
-namespace ClipFlow
+namespace ClipFlow.Desktop
 {
     public partial class App : Application
     {

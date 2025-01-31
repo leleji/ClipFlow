@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Runtime.InteropServices;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public class ConfigService
     {

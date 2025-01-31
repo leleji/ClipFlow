@@ -3,20 +3,20 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using ClipFlow.Models;
 using System.Net.Http;
 using Avalonia.Threading;
-using ClipFlow.Clipboard;
+using ClipFlow.Desktop.Clipboard;
 using System.Net.WebSockets;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Net.Http.Json;
 using static System.Net.Mime.MediaTypeNames;
-using ClipFlow.Notification;
+using ClipFlow.Desktop.Notification;
 
-namespace ClipFlow.ViewModels
+namespace ClipFlow.Desktop.ViewModels
 {
     public partial class SyncSettingsViewModel : ViewModelBase, IDisposable
     {

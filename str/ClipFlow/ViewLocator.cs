@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using ClipFlow.ViewModels;
+using ClipFlow.Desktop.ViewModels;
 using System;
 
-namespace ClipFlow
+namespace ClipFlow.Desktop
 { 
     public class ViewLocator : IDataTemplate
     {

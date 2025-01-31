@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Text;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public class WebSocketService : IDisposable
     {

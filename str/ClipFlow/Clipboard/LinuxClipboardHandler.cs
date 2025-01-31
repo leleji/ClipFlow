@@ -6,14 +6,14 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public class LinuxClipboardHandler : BaseClipboardHandler
     {

@@ -3,11 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Platform;
 using System;
 using System.IO;
-using ClipFlow.ViewModels;
+using ClipFlow.Desktop.ViewModels;
 using Avalonia.Controls.ApplicationLifetimes;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Views
+namespace ClipFlow.Desktop.Views
 {
     public partial class MainWindow : Window
     {

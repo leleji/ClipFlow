@@ -4,7 +4,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using Avalonia.Markup.Xaml;
 
-namespace ClipFlow.Controls
+namespace ClipFlow.Desktop.Controls
 {
     public partial class SettingItem : UserControl
     {

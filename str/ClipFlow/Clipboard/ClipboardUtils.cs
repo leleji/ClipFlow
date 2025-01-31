@@ -6,9 +6,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public static class ClipboardUtils
     {

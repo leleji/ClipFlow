@@ -5,13 +5,13 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public class WindowsClipboardHandler : BaseClipboardHandler
     {

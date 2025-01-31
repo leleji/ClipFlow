@@ -4,12 +4,12 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClipFlow.ViewModels
+namespace ClipFlow.Desktop.ViewModels
 {
     public partial class LogViewModel : ViewModelBase
     {

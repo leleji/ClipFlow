@@ -11,9 +11,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Win32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Notification
+namespace ClipFlow.Desktop.Notification
 {
     public class NotificationService : IDisposable
     {

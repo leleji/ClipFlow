@@ -4,7 +4,7 @@ using System.Windows;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
     public class LogService
     {

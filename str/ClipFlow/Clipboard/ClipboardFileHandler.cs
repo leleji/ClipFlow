@@ -1,6 +1,6 @@
 using Avalonia.Platform.Storage;
 using ClipFlow.Models;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace ClipFlow.Clipboard
+namespace ClipFlow.Desktop.Clipboard
 {
     public class ClipboardFileHandler
     {
