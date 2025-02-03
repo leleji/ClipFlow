@@ -9,9 +9,15 @@
     <UseAppHost>true</UseAppHost>
     <SelfContained>true</SelfContained>
     <EnableMacOSCodeSign>true</EnableMacOSCodeSign>
-	 <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
+    <ApplicationId>com.leleji.ClipFlow</ApplicationId>
+    <InfoPlistPath>Info.plist</InfoPlistPath>
+    <CFBundleIconFile>logo.icns</CFBundleIconFile>
+    <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />
+    <BundleResource Include="..\ClipFlow.Desktop\Assets\logo.icns">
+      <Link>logo.icns</Link>
+    </BundleResource>
   </ItemGroup>
 </Project>

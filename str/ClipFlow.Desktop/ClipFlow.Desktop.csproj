@@ -13,22 +13,6 @@
 	<RuntimeIdentifiers>win-x86;win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
 	<Version>0.0.2</Version>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'">
-		<UseAppHost>true</UseAppHost>
-		<PublishSingleFile>true</PublishSingleFile>
-		<SelfContained>true</SelfContained>
-		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-		<PublishReadyToRun>true</PublishReadyToRun>
-		<EnableMacOSBundle>true</EnableMacOSBundle>
-		<MacOSBundleName>ClipFlow</MacOSBundleName>
-		<MacOSBundleIdentifier>com.yourcompany.ClipFlow</MacOSBundleIdentifier>
-		<MacOSBundleIcon>../../build/logo.icns</MacOSBundleIcon>
-		<MacOSBundleInfoPlist>../../build/Info.plist</MacOSBundleInfoPlist>
-		<CFBundleShortVersionString>0.0.1</CFBundleShortVersionString>
-		<!-- 添加这一行 -->
-		<CFBundleVersion>0.0.1</CFBundleVersion>
-		<!-- 可选，如果有必要 -->
-	</PropertyGroup>
 
 
 	<ItemGroup>
