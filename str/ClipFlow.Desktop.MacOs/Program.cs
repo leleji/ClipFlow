@@ -1,12 +1,12 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Media;
-using System;
 using ClipFlow.Desktop.MacOs.Notification;
-using ClipFlow.Services;
+using ClipFlow.Desktop.Services;
 
 namespace ClipFlow.Desktop.MacOs;
 
-class Program
+internal class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -15,7 +15,7 @@ class Program
     public static void Main(string[] args)
     {
         // 注册 MacOS 通知服务
-        var notificationService = new Notification.MacOSNotificationService();
+        var notificationService = new MacOSNotificationService();
         notificationService.Initialize();
         NotificationService.RegisterPlatformService(notificationService);
 
@@ -25,21 +25,23 @@ class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
+            .With(new MacOSPlatformOptions { ShowInDock = false })
             .With(new FontManagerOptions
             {
                 DefaultFamilyName = "avares://Avalonia.Fonts.Inter/Assets#Inter",
                 FontFallbacks = new[]
                 {
-                            new FontFallback { FontFamily = "Microsoft YaHei UI" },
-                            new FontFallback { FontFamily = "Noto Sans CJK SC" },
-                            new FontFallback { FontFamily = "PingFang SC" },
-                            new FontFallback { FontFamily = "Source Han Sans SC" },
-                            new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
+                    new FontFallback { FontFamily = "Microsoft YaHei UI" },
+                    new FontFallback { FontFamily = "Noto Sans CJK SC" },
+                    new FontFallback { FontFamily = "PingFang SC" },
+                    new FontFallback { FontFamily = "Source Han Sans SC" },
+                    new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
                 }
             });
+    }
 }
-

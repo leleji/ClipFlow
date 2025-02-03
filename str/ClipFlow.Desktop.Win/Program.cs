@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Media;
 using ClipFlow.Desktop.Win.Notification;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Services;
 
 namespace ClipFlow.Desktop.Win;
 

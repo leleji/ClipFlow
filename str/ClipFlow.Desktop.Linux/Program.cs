@@ -3,7 +3,6 @@ using Avalonia.Media;
 using System;
 using ClipFlow.Desktop.Linux.Notification;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Services;
 
 namespace ClipFlow.Desktop.Linux;
 

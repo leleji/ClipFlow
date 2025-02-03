@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Interfaces;
 
-namespace ClipFlow.Services
+namespace ClipFlow.Desktop.Services
 {
 
 

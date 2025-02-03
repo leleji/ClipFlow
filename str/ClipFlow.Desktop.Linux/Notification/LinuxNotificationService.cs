@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Interfaces;
-using ClipFlow.Services;
 
 namespace ClipFlow.Desktop.Linux.Notification
 {

@@ -4,7 +4,6 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using System.Runtime.Versioning;
 using Avalonia.Threading;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Services;
 using ClipFlow.Interfaces;
 
 namespace ClipFlow.Desktop.Win.Notification

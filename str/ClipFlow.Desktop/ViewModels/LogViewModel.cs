@@ -8,6 +8,7 @@ using ClipFlow.Desktop.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ClipFlow.Desktop.ViewModels
 {
@@ -51,18 +52,15 @@ namespace ClipFlow.Desktop.ViewModels
         }
 
         [RelayCommand]
-        private async void CopySelectedLog()
+        private async Task CopySelectedLog()
         {
-            if (_selectedLogItem != null)
+            var text = $"{SelectedLogItem.Timestamp:yyyy-MM-dd HH:mm:ss} {_selectedLogItem.Type}: {_selectedLogItem.Message}";
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var text = $"{_selectedLogItem.Timestamp:yyyy-MM-dd HH:mm:ss} {_selectedLogItem.Type}: {_selectedLogItem.Message}";
-                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                var clipboard = desktop.MainWindow?.Clipboard;
+                if (clipboard != null)
                 {
-                    var clipboard = desktop.MainWindow?.Clipboard;
-                    if (clipboard != null)
-                    {
-                        await clipboard.SetTextAsync(text);
-                    }
+                    await clipboard.SetTextAsync(text);
                 }
             }
         }
