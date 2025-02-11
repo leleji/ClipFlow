@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.Win32;
+using ClipFlow.Desktop.Interfaces;
 
 namespace ClipFlow.Desktop.Services
 {

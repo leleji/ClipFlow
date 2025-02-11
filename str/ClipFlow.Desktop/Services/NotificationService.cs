@@ -33,6 +33,7 @@ namespace ClipFlow.Desktop.Services
         private NotificationService()
         {
             FileLogService._.Info("通知服务实例已创建");
+
         }
 
         public static void RegisterPlatformService(INotification service)

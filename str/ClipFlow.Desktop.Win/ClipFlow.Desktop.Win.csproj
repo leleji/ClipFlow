@@ -11,6 +11,7 @@
 	<AssemblyName>ClipFlow</AssemblyName>
 	<RootNamespace>ClipFlow</RootNamespace>
     <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
+	 <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />

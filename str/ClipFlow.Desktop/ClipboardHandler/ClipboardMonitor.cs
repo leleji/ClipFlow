@@ -19,15 +19,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 using System.Timers;
+using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.Clipboard
+namespace ClipFlow.Desktop.ClipboardHandler
 {
     public class ClipboardMonitor : IDisposable
     {
         private readonly IClipboardHandler _clipboardHandler;
         private bool _isMonitoring;
         private Timer? _timer;
-        private const string TempFolderName = "ClipFlow";
 
         // 错误事件
         public event EventHandler<Exception>? OnError;
@@ -35,9 +35,9 @@ namespace ClipFlow.Desktop.Clipboard
         public delegate void ClipboardChangedEventHandler(ClipboardData data);
         public event ClipboardChangedEventHandler? OnClipboardChanged;
 
-        public ClipboardMonitor()
+        public ClipboardMonitor(IClipboardHandler clipboardHandler)
         {
-            _clipboardHandler = ClipboardHandlerFactory.Create();
+            _clipboardHandler = clipboardHandler;
         }
 
         public void Start()

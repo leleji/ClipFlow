@@ -1,8 +1,11 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Media;
-using ClipFlow.Desktop.MacOs.Notification;
+using ClipFlow.Desktop.Interfaces;
+using ClipFlow.Desktop.MacOs.Services;
+using ClipFlow.Desktop.MacOS.Services;
 using ClipFlow.Desktop.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ClipFlow.Desktop.MacOs;
 
@@ -19,14 +22,17 @@ internal class Program
         notificationService.Initialize();
         NotificationService.RegisterPlatformService(notificationService);
 
-        BuildAvaloniaApp()
+        // 注册平台特定服务
+        ServiceCollection services = new();
+        services.AddSingleton<IClipboardHandler, MacOSClipboardService>();
+        
+        BuildAvaloniaApp(services)
             .StartWithClassicDesktopLifetime(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-    {
-        return AppBuilder.Configure<App>()
+    public static AppBuilder BuildAvaloniaApp(IServiceCollection services)
+        => AppBuilder.Configure(() => new App(services))
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
@@ -36,12 +42,11 @@ internal class Program
                 DefaultFamilyName = "avares://Avalonia.Fonts.Inter/Assets#Inter",
                 FontFallbacks = new[]
                 {
-                    new FontFallback { FontFamily = "Microsoft YaHei UI" },
-                    new FontFallback { FontFamily = "Noto Sans CJK SC" },
-                    new FontFallback { FontFamily = "PingFang SC" },
-                    new FontFallback { FontFamily = "Source Han Sans SC" },
-                    new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
+                        new FontFallback { FontFamily = "Microsoft YaHei UI" },
+                        new FontFallback { FontFamily = "Noto Sans CJK SC" },
+                        new FontFallback { FontFamily = "PingFang SC" },
+                        new FontFallback { FontFamily = "Source Han Sans SC" },
+                        new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
                 }
             });
-    }
 }

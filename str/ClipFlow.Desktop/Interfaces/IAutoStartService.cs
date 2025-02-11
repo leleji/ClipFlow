@@ -1,4 +1,4 @@
-namespace ClipFlow.Desktop.Services
+namespace ClipFlow.Desktop.Interfaces
 {
     public interface IAutoStartService
     {
@@ -6,4 +6,4 @@ namespace ClipFlow.Desktop.Services
         void Enable();
         void Disable();
     }
-} 
+}

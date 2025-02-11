@@ -1,30 +1,59 @@
-using System;
+
+
+using System.Collections.Specialized;
 
 namespace ClipFlow.Models
 {
-    /// <summary>
-    /// 剪贴板数据类
-    /// </summary>
+
+
+
     public class ClipboardData
     {
-        // 文本内容
+   
+        public StringCollection CopyFiles { get; set; }
+
+
         public string Text { get; set; }
-        // 二进制内容
-        public byte[] Data { get; set; }
-        //大小
-        public ulong? DataLength { get; set; }
-        // 内容类型
+
+  
         public ClipboardType Type { get; set; }
-        // 描述信息
+
+        public string Uuid { get; set; }
         public string Description { get; set; }
 
-        // 上传和下载文件名（非文本类型使用）
-        public string Filename { get; set; }
-        public string Uuid { get; set; }
-        //Clipboard文件集合
+        public ulong? DataLength { get; set; }
+
         public List<string> FilenameList { get; set; }
 
+        public byte[] Data { get; set; }
+
+        public string FileName { get; set; }
     }
+
+
+    ///// <summary>
+    ///// 剪贴板数据类
+    ///// </summary>
+    //public class ClipboardData
+    //{
+    //    // 文本内容
+    //    public string Text { get; set; }
+    //    // 二进制内容
+    //    public byte[] Data { get; set; }
+    //    //大小
+    //    public ulong? DataLength { get; set; }
+    //    // 内容类型
+    //    public ClipboardType Type { get; set; }
+    //    // 描述信息
+    //    public string Description { get; set; }
+
+    //    // 上传和下载文件名（非文本类型使用）
+    //    public string Filename { get; set; }
+    //    public string Uuid { get; set; }
+    //    //Clipboard文件集合
+    //    public List<string> FilenameList { get; set; }
+
+    //}
 
     public enum FileType
     {

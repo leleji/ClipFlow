@@ -79,5 +79,10 @@ namespace ClipFlow.Api.Services
             var queue = GetHistory(userKey);
             return queue.FirstOrDefault(x => x.Uuid == uuid);
         }
+
+        public IEnumerable<Queue<ClipboardData>> GetAllHistories()
+        {
+            return _clipboardHistory.Values;
+        }
     }
 } 

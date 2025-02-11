@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace ClipFlow.Desktop.Clipboard
+namespace ClipFlow.Desktop.ClipboardHandler
 {
     public class ClipboardFileHandler
     {
@@ -27,7 +26,7 @@ namespace ClipFlow.Desktop.Clipboard
             return new ClipboardData
             {
                 Type = ClipboardType.File,
-                Filename = file.Name,
+                FileName = file.Name,
                 FilenameList = new List<string> { file.Path.LocalPath },
                 DataLength = (await file.GetBasicPropertiesAsync()).Size,
                 Description = $"单文件: {file.Name}"
@@ -49,7 +48,7 @@ namespace ClipFlow.Desktop.Clipboard
             {
                 Type = ClipboardType.FileList,
                 FilenameList = items.Select(v => v.Path.LocalPath).ToList(),
-                Filename = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
+                FileName = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
                 DataLength = totalSize,
                 Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(path => Path.GetFileName(path.Path.LocalPath.TrimEnd('\\'))).Take(5))}"
             };

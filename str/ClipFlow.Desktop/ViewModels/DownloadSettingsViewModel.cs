@@ -5,28 +5,29 @@ namespace ClipFlow.Desktop.ViewModels
 {
     public partial class DownloadSettingsViewModel : ViewModelBase
     {
-        private readonly ConfigService _configService = ConfigService.Instance;
+        private readonly ConfigService _configService;
 
         [ObservableProperty]
-        private bool enableDownload;
+        private bool _enableDownload;
 
         [ObservableProperty]
-        private bool enableDownloadText;
+        private bool _enableDownloadText;
 
         [ObservableProperty]
-        private bool enableDownloadImage;
+        private bool _enableDownloadImage;
 
         [ObservableProperty]
-        private bool enableDownloadFile;
+        private bool _enableDownloadFile;
 
         [ObservableProperty]
-        private uint maxDownloadFileSize;
+        private uint _maxDownloadFileSize;
 
         [ObservableProperty]
         private bool _enableDownloadNotification;
 
-        public DownloadSettingsViewModel()
+        public DownloadSettingsViewModel(ConfigService configService)
         {
+            _configService = configService;
             LoadSettings();
         }
 

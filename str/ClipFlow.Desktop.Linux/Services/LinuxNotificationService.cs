@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Interfaces;
 
-namespace ClipFlow.Desktop.Linux.Notification
+namespace ClipFlow.Desktop.Linux.Services
 {
     public class LinuxNotificationService : INotification
     {
@@ -117,4 +117,4 @@ namespace ClipFlow.Desktop.Linux.Notification
             _notifySendPath = null;
         }
     }
-} 
+}

@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Desktop.Clipboard
+namespace ClipFlow.Desktop.Utilities
 {
     public static class ClipboardUtils
     {
@@ -19,9 +21,9 @@ namespace ClipFlow.Desktop.Clipboard
             return BitConverter.ToString(bytes).ToLower();
         }
 
-        public static async Task<List<string>> ExtractZipArchive(string zipFilePath)
+        public static StringCollection ExtractZipArchive(string zipFilePath)
         {
-            var extractedPaths = new List<string>();
+            var extractedPaths = new StringCollection();
             var extractPath = Path.GetDirectoryName(zipFilePath)!;
             var processedFirstLevelDirs = new HashSet<string>();
             var processedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -129,7 +131,7 @@ namespace ClipFlow.Desktop.Clipboard
         {
             // 获取所有文件
             var files = Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories);
-            
+
             if (files.Length > 0)
             {
                 // 如果有文件，创建必要的文件夹结构
@@ -137,7 +139,7 @@ namespace ClipFlow.Desktop.Clipboard
                 {
                     var relativePath = Path.GetRelativePath(basePath, file).Replace('\\', '/');
                     var dirName = Path.GetDirectoryName(relativePath);
-                    
+
                     if (!string.IsNullOrEmpty(dirName) && !processedDirs.Contains(dirName))
                     {
                         // 创建文件所在的文件夹及其父文件夹
@@ -153,7 +155,7 @@ namespace ClipFlow.Desktop.Clipboard
                             }
                         }
                     }
-                    
+
                     // 添加文件
                     await AddFileToArchive(archive, file, relativePath);
                 }
@@ -205,5 +207,42 @@ namespace ClipFlow.Desktop.Clipboard
                 LogService.Instance.AddLog("警告", $"添加文件到压缩包失败: {filePath} - {ex.Message}");
             }
         }
+
+
+        public static long GetTotalSize(IEnumerable<string> paths)
+        {
+            long totalSize = 0;
+
+            foreach (var path in paths)
+            {
+                if (File.Exists(path))  // 如果是文件
+                {
+                    FileInfo fileInfo = new FileInfo(path);
+                    totalSize += fileInfo.Length;
+                }
+                else if (Directory.Exists(path))  // 如果是文件夹
+                {
+                    totalSize += GetDirectorySize(path);
+                }
+            }
+
+            return totalSize;
+        }
+
+        private static long GetDirectorySize(string folderPath)
+        {
+            long size = 0;
+
+            // 获取所有文件
+            string[] files = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                size += fileInfo.Length;
+            }
+
+            return size;
+        }
+
     }
-} 
+}

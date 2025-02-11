@@ -20,9 +20,6 @@ namespace ClipFlow.Desktop.Services
             set => _obj = value;
         }
 
-
-
-
         #region Debug，调试
         public void Debug(string msg)
         {

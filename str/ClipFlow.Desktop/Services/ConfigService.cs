@@ -3,20 +3,19 @@ using System.IO;
 using System.Text.Json;
 using System.Runtime.InteropServices;
 using ClipFlow.Desktop.Models;
+using NLog.Config;
+using NLog;
 
 namespace ClipFlow.Desktop.Services
 {
     public class ConfigService
     {
-        private static ConfigService? _instance;
-        public static ConfigService Instance => _instance ??= new ConfigService();
-
         private readonly string _configPath;
         private Config _currentConfig;
 
         public Config CurrentConfig => _currentConfig;
 
-        private ConfigService()
+        public ConfigService()
         {
             _configPath = GetConfigFilePath();
             _currentConfig = LoadConfig();
@@ -47,7 +46,6 @@ namespace ClipFlow.Desktop.Services
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     ".config/clipflow");
             }
-
             // 确保配置目录存在
             try
             {

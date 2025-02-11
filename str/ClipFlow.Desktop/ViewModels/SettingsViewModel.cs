@@ -2,13 +2,14 @@ using Avalonia;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ClipFlow.Desktop.Services;
+using ClipFlow.Desktop.Interfaces;
 
 namespace ClipFlow.Desktop.ViewModels
 {
     public partial class SettingsViewModel : ViewModelBase
     {
-        private readonly ConfigService _configService = ConfigService.Instance;
-        private readonly IAutoStartService _autoStartService = new AutoStartService();
+        private readonly ConfigService _configService;
+        private readonly IAutoStartService _autoStartService;
 
         [ObservableProperty]
         private bool _autoStart;
@@ -28,8 +29,11 @@ namespace ClipFlow.Desktop.ViewModels
         [ObservableProperty]
         private bool _hideOnStartup;
 
-        public SettingsViewModel()
+        public SettingsViewModel(ConfigService configService, IAutoStartService autoStartService)
         {
+            _configService = configService;
+            _autoStartService = autoStartService;
+
             // 加载配置
             _autoStart = _autoStartService.IsEnabled;
             _minimizeToTray = _configService.CurrentConfig.MinimizeToTray;
@@ -60,10 +64,9 @@ namespace ClipFlow.Desktop.ViewModels
             _configService.CurrentConfig.ThemeMode = value;
             _configService.SaveConfig();
 
-            var app = Application.Current;
-            if (app != null)
+            if (Application.Current != null)
             {
-                app.RequestedThemeVariant = value switch
+                Application.Current.RequestedThemeVariant = value switch
                 {
                     0 => null, // 跟随系统
                     1 => ThemeVariant.Light,

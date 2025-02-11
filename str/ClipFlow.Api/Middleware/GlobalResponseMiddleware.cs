@@ -1,5 +1,10 @@
+using System;
 using System.Text.Json;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using ClipFlow.Api.Models;
+using ClipFlow.Api.Exceptions;
 using ClipFlow.Models;
 
 namespace ClipFlow.Api.Middleware
@@ -15,66 +20,72 @@ namespace ClipFlow.Api.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var originalBodyStream = context.Response.Body;
+            // 如果是WebSocket请求，直接跳过
+            if (context.WebSockets.IsWebSocketRequest)
+            {
+                await _next(context);
+                return;
+            }
 
             try
             {
-                // 特殊处理文件流响应
-                if (context.Request.Path.StartsWithSegments("/api/clipboard/file"))
-                {
-                    await _next(context);
-                    return;
-                }
-
-                using var memoryStream = new MemoryStream();
-                context.Response.Body = memoryStream;
-
                 await _next(context);
 
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                var responseBody = await new StreamReader(memoryStream).ReadToEndAsync();
-
-                var statusCode = context.Response.StatusCode;
-                object? responseObject;
-
-                if (string.IsNullOrEmpty(responseBody))
+                // 如果没有响应体，不需要处理
+                if (!context.Response.HasStarted && context.Response.Body.Length == 0)
                 {
-                    responseObject = new ApiResponse<object>
+                    var response = new ApiResponse<object>
                     {
-                        Code = statusCode,
-                        Message = statusCode == 200 ? "Success" : "Error",
+                        Code = context.Response.StatusCode,
+                        Message = "Success",
                         Data = null
                     };
-                }
-                else
-                {
-                    // 如果响应已经是 ApiResponse 格式，则不需要再包装
-                    if (responseBody.Contains("\"code\":") && responseBody.Contains("\"message\":") && responseBody.Contains("\"data\":"))
-                    {
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-                        await memoryStream.CopyToAsync(originalBodyStream);
-                        return;
-                    }
 
-                    responseObject = new ApiResponse<object>
-                    {
-                        Code = statusCode,
-                        Message = statusCode == 200 ? "Success" : "Error",
-                        Data = JsonSerializer.Deserialize<object>(responseBody)
-                    };
+                    await WriteResponseAsync(context, response);
                 }
-
-                var jsonResponse = JsonSerializer.Serialize(responseObject);
-                using var writer = new StreamWriter(originalBodyStream);
-                context.Response.Body = originalBodyStream;
-                context.Response.ContentType = "application/json";
-                await writer.WriteAsync(jsonResponse);
-                await writer.FlushAsync();
             }
-            finally
+            catch (Exception ex)
             {
-                context.Response.Body = originalBodyStream;
+                await HandleExceptionAsync(context, ex);
             }
+        }
+
+        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        {
+            // 如果响应已经开始，无法修改
+            if (context.Response.HasStarted)
+            {
+                throw ex;
+            }
+
+            var response = new ApiResponse<object>
+            {
+                Code = StatusCodes.Status500InternalServerError,
+                Message = ex.Message,
+                Data = null
+            };
+
+            if (ex is ApiException apiEx)
+            {
+                response.Code = apiEx.Code;
+            }
+
+            await WriteResponseAsync(context, response);
+        }
+
+        private async Task WriteResponseAsync<T>(HttpContext context, ApiResponse<T> response)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = response.Code;
+
+            await JsonSerializer.SerializeAsync(
+                context.Response.Body,
+                response,
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
         }
     }
 

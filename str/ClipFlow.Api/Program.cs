@@ -43,6 +43,8 @@ namespace ClipFlow.Api
                 // 配置请求体的大小限制
                 options.MaxModelBindingCollectionSize = 524288000;
                 options.Filters.Add<GlobalExceptionFilter>();
+                // 添加全局认证过滤器
+                options.Filters.Add<TokenAuthorizationFilter>();
             }).ConfigureApiBehaviorOptions(options =>
             {
                 
@@ -61,9 +63,6 @@ namespace ClipFlow.Api
             
             // 添加WebSocket支持
             builder.Services.AddSingleton<ClipboardWebSocketManager>();
-
-            // 添加过滤器
-            builder.Services.AddScoped<TokenAuthorizationFilter>();
 
             // 添加配置
             builder.Services.Configure<AppSettings>(

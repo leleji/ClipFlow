@@ -15,22 +15,22 @@ namespace ClipFlow.Desktop.ViewModels
     public partial class LogViewModel : ViewModelBase
     {
         private readonly LogService _logService;
-        public event EventHandler? LogItemsChanged;
+        public event EventHandler LogItemsChanged;
 
         [ObservableProperty]
         private Services.LogItem _selectedLogItem;
 
         public IEnumerable<Services.LogItem> LogItems => _logService.LogItems;
 
-        public IBrush TimestampBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark 
+        public static IBrush TimestampBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark 
             ? new SolidColorBrush(Color.FromRgb(180, 180, 180))
             : new SolidColorBrush(Color.FromRgb(100, 100, 100));
 
-        public IBrush TypeBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark
+        public static IBrush TypeBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark
             ? new SolidColorBrush(Color.FromRgb(77, 179, 255))
             : new SolidColorBrush(Color.FromRgb(0, 120, 215));
 
-        public IBrush MessageBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark
+        public static IBrush MessageBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark
             ? new SolidColorBrush(Color.FromRgb(220, 220, 220))
             : new SolidColorBrush(Color.FromRgb(30, 30, 30));
 
@@ -44,9 +44,9 @@ namespace ClipFlow.Desktop.ViewModels
             {
                 Application.Current.ActualThemeVariantChanged += (s, e) =>
                 {
-                    OnPropertyChanged(nameof(TimestampBrush));
-                    OnPropertyChanged(nameof(TypeBrush));
-                    OnPropertyChanged(nameof(MessageBrush));
+                    OnPropertyChanged(nameof(ViewModels.LogViewModel.TimestampBrush));
+                    OnPropertyChanged(nameof(ViewModels.LogViewModel.TypeBrush));
+                    OnPropertyChanged(nameof(ViewModels.LogViewModel.MessageBrush));
                 };
             }
         }
@@ -54,7 +54,7 @@ namespace ClipFlow.Desktop.ViewModels
         [RelayCommand]
         private async Task CopySelectedLog()
         {
-            var text = $"{SelectedLogItem.Timestamp:yyyy-MM-dd HH:mm:ss} {_selectedLogItem.Type}: {_selectedLogItem.Message}";
+            var text = $"{SelectedLogItem.Timestamp:yyyy-MM-dd HH:mm:ss} {SelectedLogItem.Type}: {SelectedLogItem.Message}";
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var clipboard = desktop.MainWindow?.Clipboard;
@@ -66,7 +66,7 @@ namespace ClipFlow.Desktop.ViewModels
         }
 
         [RelayCommand]
-        private async void CopyAllLogs()
+        private async Task CopyAllLogs()
         {
             var sb = new StringBuilder();
             foreach (var log in LogItems)

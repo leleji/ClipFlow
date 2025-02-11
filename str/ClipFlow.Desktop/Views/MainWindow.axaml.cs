@@ -6,6 +6,7 @@ using System.IO;
 using ClipFlow.Desktop.ViewModels;
 using Avalonia.Controls.ApplicationLifetimes;
 using ClipFlow.Desktop.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ClipFlow.Desktop.Views
 {
@@ -15,27 +16,18 @@ namespace ClipFlow.Desktop.Views
         private readonly MainWindowViewModel _viewModel;
         private bool _isExiting = false;
         private bool _isFirstOpen = true;
+        private readonly ConfigService _configService;
 
-        public MainWindow()
+        public MainWindow(ConfigService configService)
         {
+            _configService = configService;
             InitializeComponent();
-            _viewModel = new MainWindowViewModel();
-            DataContext = _viewModel;
-
-            // 初始化托盘图标
-            InitializeTrayIcon();
-
-            // 订阅窗口关闭事件
-            Closing += MainWindow_Closing;
-
-            // 订阅窗口打开事件
-            Opened += MainWindow_Opened;
         }
 
         private void MainWindow_Opened(object? sender, EventArgs e)
         {
             // 只在首次打开时检查是否需要隐藏
-            if (_isFirstOpen && ConfigService.Instance.CurrentConfig.HideOnStartup)
+            if (_isFirstOpen && _configService.CurrentConfig.HideOnStartup)
             {
                 Hide();
                 _isFirstOpen = false;
@@ -68,7 +60,7 @@ namespace ClipFlow.Desktop.Views
 
         private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
         {
-            if (ConfigService.Instance.CurrentConfig?.MinimizeToTray == true && !_isExiting)
+            if (_configService.CurrentConfig?.MinimizeToTray == true && !_isExiting)
             {
                 e.Cancel = true;  // 取消关闭操作
                 Hide();          // 隐藏窗口

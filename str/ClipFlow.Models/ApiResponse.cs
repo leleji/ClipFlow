@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ClipFlow.Models
 {
     public class ApiResponse<T>
@@ -25,7 +27,7 @@ namespace ClipFlow.Models
                 Data = default
             };
         }
-
+        [JsonIgnore]
         public bool IsSuccessStatusCode { get { return Code==200; } }
     }
 } 

@@ -4,7 +4,7 @@ using ClipFlow.Desktop.Services;
 using ClipFlow.Interfaces;
 using Foundation;
 
-namespace ClipFlow.Desktop.MacOs.Notification;
+namespace ClipFlow.Desktop.MacOs.Services;
 
 public class MacOSNotificationService : INotification
 {
@@ -13,23 +13,16 @@ public class MacOSNotificationService : INotification
 
     public void Initialize()
     {
-        try
-        {
-            _notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
+        _notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
 
-            if (_notificationCenter != null)
-            {
-                _isInitialized = true;
-                FileLogService._.Info("macOS通知服务初始化成功");
-            }
-            else
-            {
-                FileLogService._.Error("macOS通知服务初始化失败");
-            }
-        }
-        catch (Exception ex)
+        if (_notificationCenter != null)
         {
-            FileLogService._.Error("初始化 macOS 通知失败", ex);
+            _isInitialized = true;
+            FileLogService._.Info("macOS通知服务初始化成功");
+        }
+        else
+        {
+            FileLogService._.Error("macOS通知服务初始化失败");
         }
     }
 

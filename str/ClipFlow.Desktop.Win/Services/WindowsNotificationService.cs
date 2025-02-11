@@ -2,11 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Runtime.Versioning;
-using Avalonia.Threading;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Interfaces;
+using Avalonia.Threading;
 
-namespace ClipFlow.Desktop.Win.Notification
+namespace ClipFlow.Desktop.Win.Services
 {
     [SupportedOSPlatform("windows10.0.19041.0")]
     public class WindowsNotificationService : INotification
@@ -83,4 +83,4 @@ namespace ClipFlow.Desktop.Win.Notification
             }
         }
     }
-} 
+}

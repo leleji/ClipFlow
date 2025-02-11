@@ -5,7 +5,7 @@ namespace ClipFlow.Desktop.ViewModels
 {
     public partial class UploadSettingsViewModel : ViewModelBase
     {
-        private readonly ConfigService _configService = ConfigService.Instance;
+        private readonly ConfigService _configService;
 
         [ObservableProperty]
         private bool enableUpload;
@@ -31,8 +31,9 @@ namespace ClipFlow.Desktop.ViewModels
         [ObservableProperty]
         private bool _enableUploadNotification;
 
-        public UploadSettingsViewModel()
+        public UploadSettingsViewModel(ConfigService configService)
         {
+            _configService = configService;
             LoadSettings();
         }
 

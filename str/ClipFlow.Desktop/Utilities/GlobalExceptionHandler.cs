@@ -1,8 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using ClipFlow.Desktop.Services;
 
-namespace ClipFlow.Desktop.Services
+namespace ClipFlow.Desktop.Utilities
 {
     public static class GlobalExceptionHandler
     {
@@ -30,4 +31,4 @@ namespace ClipFlow.Desktop.Services
             };
         }
     }
-} 
+}

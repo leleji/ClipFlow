@@ -8,14 +8,17 @@ namespace ClipFlow.Api.Services
         private readonly ILogger<FileCleanupService> _logger;
         private readonly AppSettings _appSettings;
         private readonly string _fileStoragePath;
+        private readonly ClipboardDataManager _clipboardManager;
         private Timer? _timer;
 
         public FileCleanupService(
             ILogger<FileCleanupService> logger,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings,
+            ClipboardDataManager clipboardManager)
         {
             _logger = logger;
             _appSettings = appSettings.Value;
+            _clipboardManager = clipboardManager;
             _fileStoragePath = Path.Combine(AppContext.BaseDirectory, "files");
         }
 
@@ -48,8 +51,29 @@ namespace ClipFlow.Api.Services
                     {
                         try
                         {
-                            System.IO.File.Delete(file);
-                            _logger.LogInformation($"已删除过期文件: {fileInfo.Name}");
+                            // 从文件名中提取UUID
+                            var uuid = Path.GetFileNameWithoutExtension(fileInfo.Name);
+                            
+                            // 检查文件是否在任何用户的剪贴板历史中使用
+                            var isInUse = false;
+                            foreach (var history in _clipboardManager.GetAllHistories())
+                            {
+                                if (history.Any(x => x.Uuid == uuid))
+                                {
+                                    isInUse = true;
+                                    break;
+                                }
+                            }
+
+                            if (!isInUse)
+                            {
+                                System.IO.File.Delete(file);
+                                _logger.LogInformation($"已删除过期文件: {fileInfo.Name}");
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"文件仍在使用中，跳过删除: {fileInfo.Name}");
+                            }
                         }
                         catch (Exception ex)
                         {

@@ -5,6 +5,8 @@ namespace ClipFlow.Desktop.Models
         public string Host { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public string UserKey { get; set; } = string.Empty;
+
+        public string DataKey { get; set; } = string.Empty;
         public bool IsEnabled { get; set; }
         public int ThemeMode { get; set; }
         public bool MinimizeToTray { get; set; } = true;

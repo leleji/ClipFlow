@@ -15,7 +15,6 @@ namespace ClipFlow.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [TokenAuthorization]
     public class ClipboardController : ControllerBase
     {
         private readonly ClipboardWebSocketManager _webSocketManager;
@@ -47,7 +46,7 @@ namespace ClipFlow.Api.Controllers
         [HttpPost("{type}")]
         [RequestSizeLimit(524288000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
-        public async Task<ActionResult<ApiResponse<object>>> Upload(string type, [FromQuery] string? filename)
+        public async Task<ActionResult<ApiResponse<object>>> Upload(string type)
         {
             try
             {
@@ -69,55 +68,43 @@ namespace ClipFlow.Api.Controllers
                     Uuid = Guid.NewGuid().ToString(),
                     Type = Enum.Parse<ClipboardType>(type, true)
                 };
+                record.DataLength = contentLength;
 
-                if (record.Type == ClipboardType.Text)
-                {
-                    using var memoryStream = new MemoryStream();
-                    await Request.Body.CopyToAsync(memoryStream);
-                    record.Data = memoryStream.ToArray();
-                }
-                else
-                {
-                    record.DataLength = contentLength;
-                    record.Filename = SanitizeFileName(filename);
-                    
-                    // 保存文件时使用 UUID 作为前缀
-                    var physicalFileName = $"{record.Uuid}_{record.Filename}";
-                    var filePath = Path.Combine(_fileStoragePath, physicalFileName);
+                // 保存文件时使用 UUID 作为前缀
+                var physicalFileName = $"{record.Uuid}.dat";
+                var filePath = Path.Combine(_fileStoragePath, physicalFileName);
 
-                    const int bufferSize = 81920; // 80KB 缓冲区
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous))
+                const int bufferSize = 81920; // 80KB 缓冲区
+                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous))
+                {
+                    var buffer = new byte[bufferSize];
+                    int bytesRead;
+                    long totalBytesRead = 0;
+                    var body = Request.Body;
+
+                    while ((bytesRead = await body.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
-                        var buffer = new byte[bufferSize];
-                        int bytesRead;
-                        long totalBytesRead = 0;
-                        var body = Request.Body;
+                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
 
-                        while ((bytesRead = await body.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            await fileStream.WriteAsync(buffer, 0, bytesRead);
-                            totalBytesRead += bytesRead;
-
-                            // 可选：报告进度
-                            //if (contentLength > 0)
-                            //{
-                            //    var progress = (double)totalBytesRead / contentLength * 100;
-                            //    _logger.LogDebug($"Upload progress: {progress:F2}% ({totalBytesRead}/{contentLength} bytes)");
-                            //}
-                        }
-
-                        await fileStream.FlushAsync();
+                        // 可选：报告进度
+                        //if (contentLength > 0)
+                        //{
+                        //    var progress = (double)totalBytesRead / contentLength * 100;
+                        //    _logger.LogDebug($"Upload progress: {progress:F2}% ({totalBytesRead}/{contentLength} bytes)");
+                        //}
                     }
-                }
 
+                    await fileStream.FlushAsync();
+                }
                 // 添加到历史记录
                 _clipboardManager.AddRecord(userKey, record);
                 if (_clipboardManager.GetHistory(userKey).Count > 20)
                 {
                     var oldRecord = _clipboardManager.GetHistory(userKey).Dequeue();
-                    if (oldRecord.Filename != null)
+                    if (oldRecord.FileName != null)
                     {
-                        var oldFile = Path.Combine(_fileStoragePath, oldRecord.Filename);
+                        var oldFile = Path.Combine(_fileStoragePath, oldRecord.FileName);
                         if (System.IO.File.Exists(oldFile))
                         {
                             System.IO.File.Delete(oldFile);
@@ -159,18 +146,18 @@ namespace ClipFlow.Api.Controllers
         {
             var userKey = Request.Headers["X-User-Key"].ToString();
             var record = _clipboardManager.GetByUuid(userKey, uuid);
-            if (record == null || record.Filename == null)
+            if (record == null)
             {
-                return NotFound(ApiResponse<object>.Error(404, "文件未找到"));
+                return NotFound(ApiResponse<object>.Error(404, "数据未找到"));
             }
 
-            var physicalFileName = $"{uuid}_{record.Filename}";
+            var physicalFileName = $"{uuid}.dat";
             var filePath = Path.Combine(_fileStoragePath, physicalFileName);
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound(ApiResponse<object>.Error(404, "文件未找到"));
             }
-            return PhysicalFile(filePath, "application/octet-stream", record.Filename);
+            return PhysicalFile(filePath, "application/octet-stream", record.FileName);
         }
 
         [HttpGet]
@@ -253,37 +240,5 @@ namespace ClipFlow.Api.Controllers
             }
         }
 
-        private string SanitizeFileName(string fileName)
-        {
-            if (string.IsNullOrEmpty(fileName)) return fileName;
-
-            // 替换 Windows 和 Linux 中的非法字符
-            var invalidChars = Path.GetInvalidFileNameChars()
-                .Concat(new[] { '\\', '/' })  // 添加额外的路径分隔符
-                .ToArray();
-            
-            // 替换非法字符为下划线
-            var sanitizedName = invalidChars.Aggregate(fileName, (current, invalid) => 
-                current.Replace(invalid, '_'));
-
-            // 处理以点或空格开头的文件名
-            sanitizedName = sanitizedName.TrimStart('.', ' ');
-            
-            // 如果文件名为空（比如全是非法字符），生成一个默认名称
-            if (string.IsNullOrWhiteSpace(sanitizedName))
-            {
-                sanitizedName = $"file_{DateTime.UtcNow:yyyyMMddHHmmss}";
-            }
-
-            // 确保文件名不超过最大长度（考虑到不同文件系统的限制）
-            const int maxFileNameLength = 200; // 设置一个安全的最大长度
-            if (sanitizedName.Length > maxFileNameLength)
-            {
-                var extension = Path.GetExtension(sanitizedName);
-                sanitizedName = sanitizedName.Substring(0, maxFileNameLength - extension.Length) + extension;
-            }
-
-            return sanitizedName;
-        }
     }
 } 

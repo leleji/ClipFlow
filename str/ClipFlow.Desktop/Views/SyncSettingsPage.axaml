@@ -57,6 +57,16 @@
 							   Text="{Binding UserKey}"/>
 							</controls:SettingItem.ActionContent>
 						</controls:SettingItem>
+						<controls:SettingItem Title="同步加密"
+					  BackgroundColor="Transparent"
+					  BorderThickness="0,1,0,0"
+                      CornerRadius="0"
+					 Description="数据加密key">
+							<controls:SettingItem.ActionContent>
+								<TextBox
+							   Text="{Binding DataKey}"/>
+							</controls:SettingItem.ActionContent>
+						</controls:SettingItem>
 					</StackPanel>
 				</controls:CardExpander.CardContent>
 			</controls:CardExpander>
