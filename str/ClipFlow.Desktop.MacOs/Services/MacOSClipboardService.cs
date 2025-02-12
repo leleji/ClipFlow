@@ -11,6 +11,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AppKit;
+using ClipFlow.Desktop.Utilities;
+using Foundation;
+using ObjCRuntime;
 
 namespace ClipFlow.Desktop.MacOS.Services
 {
@@ -23,46 +27,80 @@ namespace ClipFlow.Desktop.MacOS.Services
 
         public async Task<ClipboardData?> GetContentAsync()
         {
-            if (_isSettingClipboard) return null;
-
+            // if (_isSettingClipboard) return null;
+            //NSApplication.Init();
             try
             {
-                if (App.Clipboard != null)
+                var pasteboard = NSPasteboard.GeneralPasteboard;
+                var types = pasteboard.Types;
+                if (types.Contains(NSPasteboard.NSFilenamesType))
                 {
-                    var clipboard = App.Clipboard;
-                    var formats = await clipboard.GetFormatsAsync();
-                    
-                    if (formats.Contains(FileFormat))
+                    var files = pasteboard.GetPropertyListForType(NSPasteboard.NSFilenamesType) as NSArray;
+                    var filesHash = GetMd5Hash(string.Join("|", files.Select(f => f)));
+                    if (filesHash == _lastHash) return null;
+                    _lastHash = filesHash;
+                    return ProcessFiles(files.Cast<NSString>().Select(ns => ns.ToString()).ToList());
+                }
+                else if (types.Contains(NSPasteboard.NSStringType))
+                {
+                    var text = pasteboard.GetDataForType(NSPasteboard.NSStringType).ToString();
+                    if (string.IsNullOrEmpty(text)) return null;
+                    var textHash = GetMd5Hash(text);
+                    if (textHash == _lastHash) return null;
+                    _lastHash = textHash;
+                    return ProcessText(text);
+                }
+                else if (types.Contains(NSPasteboard.NSPictType) || types.Contains(NSPasteboard.NSTiffType))
+                {
+                    // 从剪贴板获取图片
+                    var images = pasteboard.ReadObjectsForClasses(new Class[] { new Class(typeof(NSImage)) }, null);
+                    if (images != null && images.Length > 0)
                     {
-                        var clipboardFiles = await clipboard.GetDataAsync("Files") as IEnumerable<IStorageItem>;
-                        if (clipboardFiles != null)
+                        NSImage image = images[0] as NSImage;
+                        if (image != null)
                         {
-                            var filesHash = GetMd5Hash(string.Join("|", clipboardFiles.Select(f => f.Path.LocalPath)));
-                            if (filesHash == _lastHash) return null;
-                            _lastHash = filesHash;
-                            return await ProcessFiles(clipboardFiles);
+                            string savePath = Path.Combine(Path.GetTempPath(), $"ClipFlow/{Guid.NewGuid()}.png");
+                            var textHash = GetMd5Hash(savePath);
+                            if (textHash == _lastHash) return null;
+                            if (SaveImage(image, savePath))
+                            {
+                                Console.WriteLine($"Image saved to: {savePath}");
+                                _lastHash = textHash;
+                                return ProcessSingleFile(savePath);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Failed to save image.");
+                            }
                         }
                     }
                     else
                     {
-                        var text = await clipboard.GetTextAsync();
-                        if (string.IsNullOrEmpty(text)) return null;
-                        
-                        var textHash = GetMd5Hash(text);
-                        if (textHash == _lastHash) return null;
-                        _lastHash = textHash;
-                        return ProcessText(text);
+                        Console.WriteLine("No valid image found on clipboard.");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogService.Instance.AddLog("错误", $"获取剪贴板内容失败: {ex.Message}");
+        }catch (Exception ex) {
+             LogService.Instance.AddLog("错误", $"获取剪贴板内容失败: {ex.Message}"); 
             }
 
-            return null;
+        return null;
+    }
+        /// <summary>
+        /// 将 NSImage 保存为 PNG 文件
+        /// </summary>
+        public static bool SaveImage(NSImage image, string filePath)
+        {
+            if (image == null) return false;
+
+            var tiffData = image.AsTiff();
+            if (tiffData == null) return false;
+
+            var bitmap = new NSBitmapImageRep(tiffData);
+            var pngData = bitmap.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png);
+            if (pngData == null) return false;
+
+            return pngData.Save(filePath, true);
         }
-
         public async Task<bool> SetContentAsync(ClipboardData data, bool isServerUpdate = true)
         {
             try
@@ -162,49 +200,40 @@ namespace ClipFlow.Desktop.MacOS.Services
             return null;
         }
 
-        private async Task<ClipboardData?> ProcessFiles(IEnumerable<IStorageItem> files)
+        private ClipboardData? ProcessFiles(IEnumerable<string> files)
         {
             var fileList = files.ToList();
-            if (!fileList.Any()) return null;
-
-            return fileList.Count == 1 && !Directory.Exists(fileList[0].Path.LocalPath)
-                ? await ProcessSingleFile(fileList[0])
-                : await ProcessMultipleItems(fileList);
+            if (!files.Any()) return null;
+            return fileList.Count == 1 && !Directory.Exists(fileList[0])
+                ?  ProcessSingleFile(fileList[0])
+                :  ProcessMultipleItems(fileList);
         }
 
-        private async Task<ClipboardData> ProcessSingleFile(IStorageItem file)
+        private ClipboardData ProcessSingleFile(string file)
         {
+            FileInfo fileInfo = new FileInfo(file);
             return new ClipboardData
             {
                 Type = ClipboardType.File,
-                Filename = file.Name,
-                FilenameList = new List<string> { file.Path.LocalPath },
-                DataLength = (await file.GetBasicPropertiesAsync()).Size,
-                Description = $"单文件: {file.Name}"
+                FileName = fileInfo.Name,
+                FilenameList = new List<string> { file },
+                DataLength = (ulong)file.Length,
+                Description = $"单文件: {fileInfo.Name}"
             };
         }
 
-        private async Task<ClipboardData> ProcessMultipleItems(List<IStorageItem> items)
+        private ClipboardData ProcessMultipleItems(List<string> files)
         {
-            var sizes = await Task.WhenAll(items.Select(async file => (await file.GetBasicPropertiesAsync()).Size));
-            ulong totalSize = 0;
-            foreach (var size in sizes)
-            {
-                if (size.HasValue)
-                {
-                    totalSize += size.Value;
-                }
-            }
+            ulong totalSize = (ulong)ClipboardUtils.GetTotalSize(files);
             return new ClipboardData
             {
                 Type = ClipboardType.FileList,
-                FilenameList = items.Select(v => v.Path.LocalPath).ToList(),
-                Filename = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
+                FilenameList = files,
+                FileName = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
                 DataLength = totalSize,
-                Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(path => Path.GetFileName(path.Path.LocalPath.TrimEnd('\\'))).Take(5))}"
+                Description = $"{files.Count} 个文件: {string.Join(", ", files.Select(path => Path.GetFileName(path.TrimEnd('\\'))).Take(5))}"
             };
         }
-
         private ClipboardData? ProcessText(string text)
         {
             if (string.IsNullOrEmpty(text)) return null;

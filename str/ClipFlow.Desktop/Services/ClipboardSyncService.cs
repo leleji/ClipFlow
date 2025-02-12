@@ -332,16 +332,19 @@ namespace ClipFlow.Desktop.Services
                 _uploadCancellationTokenSource.Cancel();
                 _uploadCancellationTokenSource.Dispose();
             }
+            if (!CheckSyncUploadsRestrictions(data))
+            {
+                return;
+            }
             _uploadCancellationTokenSource = new CancellationTokenSource();
             var tempPath = Path.Combine(Path.GetTempPath(), $"ClipFlow{Path.DirectorySeparatorChar}{data.FileName}");
 
             try
             {
-                if (!CheckSyncUploadsRestrictions(data))
+                if (!Directory.Exists(Path.Combine(Path.GetTempPath(), $"ClipFlow")))
                 {
-                    return;
+                    Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"ClipFlow"));
                 }
-
                 LogService.Instance.AddLog("上传", data.Description);
                 const int maxRetries = 3;
                 int currentRetry = 0;
@@ -351,10 +354,6 @@ namespace ClipFlow.Desktop.Services
                     try
                     {
                         var url = $"{_baseUrl}/{data.Type.ToString().ToLower()}";
-                        if (data.Type != ClipboardType.Text)
-                        {
-                            url += $"?filename={Uri.EscapeDataString(data.FileName)}";
-                        }
                         FileStream fileStream1=null ;
                         HttpContent content;
                         switch (data.Type)
