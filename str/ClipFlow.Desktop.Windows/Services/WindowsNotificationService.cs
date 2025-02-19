@@ -6,7 +6,7 @@ using ClipFlow.Desktop.Services;
 using Avalonia.Threading;
 using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     [SupportedOSPlatform("windows10.0.19041.0")]
     public class WindowsNotificationService : INotificationService

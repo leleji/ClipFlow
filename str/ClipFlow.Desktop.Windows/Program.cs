@@ -4,10 +4,10 @@ using Avalonia.Media;
 using ClipFlow.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.Win.Services;
+using ClipFlow.Desktop.Windows.Services;
 using NLog;
 
-namespace ClipFlow.Desktop.Win;
+namespace ClipFlow.Desktop.Windows;
 
 internal class Program
 {

@@ -6,7 +6,7 @@ using ClipFlow.Desktop.Interfaces;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     public class ClipboardMonitor : Form, IClipboardMonitor
     {

@@ -49,7 +49,7 @@ jobs:
 
           # Build .NET application
           mkdir -p $output_dir
-          dotnet publish "./str/ClipFlow/ClipFlow.csproj" \
+          dotnet publish "./str/ClipFlow.Desktop.Linux/ClipFlow.Desktop.Linux.csproj" \
             --verbosity quiet \
             --nologo \
             --configuration Release \

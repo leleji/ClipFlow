@@ -20,7 +20,7 @@ jobs:
         self_contained: [true, false]  # 定义是否为 self-contained
 
     env:
-      Solution_Name: str/ClipFlow/ClipFlow.csproj
+      Solution_Name: str/ClipFlow.Desktop.Windows/ClipFlow.Desktop.Windows.csproj
       Configuration: Release
 
     steps:
@@ -37,7 +37,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore ./str/ClipFlow/ClipFlow.csproj
+      run: dotnet restore ./str/ClipFlow.Desktop.Windows/ClipFlow.Desktop.Windows.csproj
 
     # 发布应用程序
     - name: Publish Application

@@ -18,7 +18,7 @@ jobs:
     - name: Get Version
       id: version
       run: |
-        csprojPath="./str/ClipFlow/ClipFlow.csproj"
+        csprojPath="./str/ClipFlow.Desktop/ClipFlow.Desktop.csproj"
         if [ -f "$csprojPath" ]; then
           version=$(grep -oP '<Version>\K[^<]+' "$csprojPath")
           if [ -n "$version" ]; then
@@ -29,7 +29,7 @@ jobs:
             exit 1
           fi
         else
-          echo "ClipFlow.csproj not found at $csprojPath"
+          echo "ClipFlow.Desktop.csproj not found at $csprojPath"
           exit 1
         fi
     # 使用版本号

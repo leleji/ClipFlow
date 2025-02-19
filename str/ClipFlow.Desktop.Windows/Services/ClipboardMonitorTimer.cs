@@ -21,7 +21,7 @@ using Path = System.IO.Path;
 using System.Timers;
 using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     public class ClipboardMonitorTimer : IClipboardMonitor
     {

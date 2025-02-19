@@ -16,7 +16,7 @@ using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     public class WindowsClipboardService : IClipboardHandler
     {

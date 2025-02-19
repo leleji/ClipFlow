@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Api", "ClipFlow.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Models", "ClipFlow.Models\ClipFlow.Models.csproj", "{C381C216-C33A-49F5-8E30-569BB122C54A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.Win", "ClipFlow.Desktop.Win\ClipFlow.Desktop.Win.csproj", "{91B856A3-19F0-447E-A61F-877082E2D50E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.Windows", "ClipFlow.Desktop.Windows\ClipFlow.Desktop.Windows.csproj", "{91B856A3-19F0-447E-A61F-877082E2D50E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.MacOs", "ClipFlow.Desktop.MacOs\ClipFlow.Desktop.MacOs.csproj", "{CD1336FC-94E8-40D6-9248-012F23A55DD7}"
 EndProject

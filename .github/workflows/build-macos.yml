@@ -27,14 +27,14 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore ./str/ClipFlow/ClipFlow.csproj
+      run: dotnet restore ./str/ClipFlow.Desktop.MacOs/ClipFlow.Desktop.MacOs.csproj
 
 
     - name: Publish the project
       run: |
         output_dir="./publish/osx-${{ matrix.arch }}-${{ matrix.self_contained }}"
         sc_flag="--self-contained ${{ matrix.self_contained }}"
-        dotnet publish ./str/ClipFlow/ClipFlow.csproj \
+        dotnet publish ./str/ClipFlow.Desktop.MacOs/ClipFlow.Desktop.MacOs.csproj \
           -c Release \
           -o $output_dir \
           -r osx-${{ matrix.arch }} \
