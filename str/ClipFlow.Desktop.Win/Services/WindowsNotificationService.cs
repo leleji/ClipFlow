@@ -3,16 +3,21 @@ using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Runtime.Versioning;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Interfaces;
 using Avalonia.Threading;
+using ClipFlow.Desktop.Interfaces;
 
 namespace ClipFlow.Desktop.Win.Services
 {
     [SupportedOSPlatform("windows10.0.19041.0")]
-    public class WindowsNotificationService : INotification
+    public class WindowsNotificationService : INotificationService
     {
         private bool _isInitialized;
         private const string APP_NAME = "ClipFlow";
+
+        public WindowsNotificationService()
+        {
+            Initialize();
+        }
 
         public void Initialize()
         {
@@ -25,15 +30,15 @@ namespace ClipFlow.Desktop.Win.Services
                 }
                 catch (Exception ex)
                 {
-                    FileLogService._.Error("清理旧通知失败，但不影响使用", ex);
+                    FileLogService.Instance.Error("清理旧通知失败，但不影响使用", ex);
                 }
 
                 _isInitialized = true;
-                FileLogService._.Info("Windows通知服务初始化成功");
+                FileLogService.Instance.Info("Windows通知服务初始化成功");
             }
             catch (Exception ex)
             {
-                FileLogService._.Error("初始化 Windows 通知失败", ex);
+                FileLogService.Instance.Error("初始化 Windows 通知失败", ex);
             }
         }
 
@@ -41,7 +46,7 @@ namespace ClipFlow.Desktop.Win.Services
         {
             if (!_isInitialized)
             {
-                FileLogService._.Error("通知服务未初始化");
+                FileLogService.Instance.Error("通知服务未初始化");
                 return;
             }
 
@@ -59,7 +64,7 @@ namespace ClipFlow.Desktop.Win.Services
                 }
                 catch (Exception ex)
                 {
-                    FileLogService._.Error("显示 Windows 通知失败", ex);
+                    FileLogService.Instance.Error("显示 Windows 通知失败", ex);
                 }
             });
         }
@@ -75,7 +80,7 @@ namespace ClipFlow.Desktop.Win.Services
             }
             catch (Exception ex)
             {
-                FileLogService._.Error("清理 Windows 通知失败", ex);
+                FileLogService.Instance.Error("清理 Windows 通知失败", ex);
             }
             finally
             {

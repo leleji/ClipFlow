@@ -11,10 +11,10 @@ namespace ClipFlow.Desktop.Controls
         public static readonly StyledProperty<IBrush> BackgroundColorProperty =
             AvaloniaProperty.Register<SettingItem, IBrush>(nameof(BackgroundColor));
 
-        public static readonly StyledProperty<Thickness> BorderThicknessProperty =
+        public static new readonly StyledProperty<Thickness> BorderThicknessProperty =
             AvaloniaProperty.Register<SettingItem, Thickness>(nameof(BorderThickness), new Thickness(1));
 
-        public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
+        public static new readonly StyledProperty<CornerRadius> CornerRadiusProperty =
             AvaloniaProperty.Register<SettingItem, CornerRadius>(nameof(CornerRadius), new CornerRadius(4));
 
         public static readonly StyledProperty<string> TitleProperty =
@@ -50,13 +50,13 @@ namespace ClipFlow.Desktop.Controls
             set => SetValue(BackgroundColorProperty, value);
         }
 
-        public Thickness BorderThickness
+        public new Thickness BorderThickness
         {
             get => GetValue(BorderThicknessProperty);
             set => SetValue(BorderThicknessProperty, value);
         }
 
-        public CornerRadius CornerRadius
+        public new CornerRadius CornerRadius
         {
             get => GetValue(CornerRadiusProperty);
             set => SetValue(CornerRadiusProperty, value);

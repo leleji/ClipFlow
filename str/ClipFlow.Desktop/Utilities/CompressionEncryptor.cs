@@ -31,9 +31,13 @@ namespace ClipFlow.Desktop.Utilities
             stream.Write(BitConverter.GetBytes((int)data.Type));
             stream.Write(BitConverter.GetBytes(data.Data.Length));
             stream.Write(data.Data);
-            byte[] encryptedData = EncryptWithEcb(stream.ToArray(), password);
-            
-            return encryptedData;
+            if (string.IsNullOrEmpty(password))
+            {
+                return stream.ToArray();
+            }
+            else {
+                return EncryptWithEcb(stream.ToArray(), password);
+            }
         }
         public static void EncryptClipboardDataToTemporaryFile(string path, ClipboardData data, string password)
         {
@@ -59,7 +63,18 @@ namespace ClipFlow.Desktop.Utilities
             {
                 fs.Write(buffer, 0, bytesRead);
             }
-            EncryptFileStream(fs, password, $"{tempPath}.dat");
+            if (string.IsNullOrEmpty(password))
+            {
+                fs.Close();
+                File.Move($"{tempPath}.tmp", $"{tempPath}.dat");
+            }
+            else
+            {
+                EncryptFileStream(fs, password, $"{tempPath}.dat");
+            }
+
+
+            
           
         }
 

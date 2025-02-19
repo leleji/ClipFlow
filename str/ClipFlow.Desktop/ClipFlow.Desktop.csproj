@@ -1,18 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
 	<TargetFramework>net8.0</TargetFramework>
-    <Nullable>disable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <AssemblyName>ClipFlow.Desktop</AssemblyName>
-    <RootNamespace>ClipFlow.Desktop</RootNamespace>
-    
-	<EnableWindowsTargeting>true</EnableWindowsTargeting>
-	<RuntimeIdentifiers>win-x86;win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
-	<Version>0.0.2</Version>
-	<Platforms>AnyCPU;x64</Platforms>
+	<Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	<Version>0.1.0</Version>
   </PropertyGroup>
 
 
@@ -27,16 +19,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia" Version="11.2.4" />
     <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="ZstdSharp.Port" Version="0.8.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageReference Include="NLog" Version="5.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +36,9 @@
   <ItemGroup>
     <Compile Update="Views\SyncSettingsPage.axaml.cs">
       <DependentUpon>SyncSettingsPage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="App.axaml.cs">
+      <DependentUpon>App.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 

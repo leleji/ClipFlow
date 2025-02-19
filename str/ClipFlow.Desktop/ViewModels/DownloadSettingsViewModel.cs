@@ -14,9 +14,6 @@ namespace ClipFlow.Desktop.ViewModels
         private bool _enableDownloadText;
 
         [ObservableProperty]
-        private bool _enableDownloadImage;
-
-        [ObservableProperty]
         private bool _enableDownloadFile;
 
         [ObservableProperty]
@@ -35,7 +32,6 @@ namespace ClipFlow.Desktop.ViewModels
         {
             EnableDownload = _configService.CurrentConfig.EnableDownload;
             EnableDownloadText = _configService.CurrentConfig.EnableDownloadText;
-            EnableDownloadImage = _configService.CurrentConfig.EnableDownloadImage;
             EnableDownloadFile = _configService.CurrentConfig.EnableDownloadFile;
             MaxDownloadFileSize = _configService.CurrentConfig.MaxDownloadFileSize;
             EnableDownloadNotification = _configService.CurrentConfig.EnableDownloadNotification;
@@ -53,11 +49,6 @@ namespace ClipFlow.Desktop.ViewModels
             _configService.SaveConfig();
         }
 
-        partial void OnEnableDownloadImageChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableDownloadImage = value;
-            _configService.SaveConfig();
-        }
 
         partial void OnEnableDownloadFileChanged(bool value)
         {

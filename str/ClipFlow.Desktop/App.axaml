@@ -17,7 +17,7 @@
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
-            <!-- SVG å›¾æ ‡èµ„æº -->
+            <!-- SVG Í¼±ê×ÊÔ´ -->
             <StreamGeometry x:Key="home_icon">M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69M12 3L2 12H5V20H11V14H13V20H19V12H22L12 3Z</StreamGeometry>
             <StreamGeometry x:Key="upload_icon">M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z</StreamGeometry>
             <StreamGeometry x:Key="download_icon">M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z</StreamGeometry>
@@ -34,7 +34,7 @@
     <Application.Styles>
         <FluentTheme />
         
-        <!-- æ»šåŠ¨æ¡æ ·å¼ -->
+        <!-- ¹ö¶¯ÌõÑùÊ½ -->
         <Style Selector="ScrollBar">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Width" Value="4"/>

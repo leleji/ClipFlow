@@ -26,9 +26,6 @@ namespace ClipFlow.Desktop.ViewModels
         [ObservableProperty]
         private string _description = "在这里管理您的设置";
 
-        [ObservableProperty]
-        private bool _hideOnStartup;
-
         public SettingsViewModel(ConfigService configService, IAutoStartService autoStartService)
         {
             _configService = configService;
@@ -37,7 +34,6 @@ namespace ClipFlow.Desktop.ViewModels
             // 加载配置
             _autoStart = _autoStartService.IsEnabled;
             _minimizeToTray = _configService.CurrentConfig.MinimizeToTray;
-            _hideOnStartup = _configService.CurrentConfig.HideOnStartup;
             _themeMode = _configService.CurrentConfig.ThemeMode;
         }
 
@@ -74,12 +70,6 @@ namespace ClipFlow.Desktop.ViewModels
                     _ => null
                 };
             }
-        }
-
-        partial void OnHideOnStartupChanged(bool value)
-        {
-            _configService.CurrentConfig.HideOnStartup = value;
-            _configService.SaveConfig();
         }
     }
 } 

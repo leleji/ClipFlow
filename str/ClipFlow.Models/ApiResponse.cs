@@ -6,7 +6,7 @@ namespace ClipFlow.Models
     {
         public int Code { get; set; }
         public string Message { get; set; }
-        public T? Data { get; set; }
+        public T Data { get; set; }
 
         public static ApiResponse<T> Success(T data, string message = "Success")
         {

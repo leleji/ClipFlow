@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Interfaces
+namespace ClipFlow.Desktop.Interfaces
 {
-    public interface INotification: IDisposable
+    public interface INotificationService : IDisposable
     {
         void Initialize();
         Task ShowNotificationAsync(string title, string message);

@@ -21,19 +21,16 @@ using Path = System.IO.Path;
 using System.Timers;
 using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.ClipboardHandler
+namespace ClipFlow.Desktop.Win.Services
 {
-    public class ClipboardMonitor : IDisposable
+    public class ClipboardMonitor : IClipboardMonitor
     {
         private readonly IClipboardHandler _clipboardHandler;
         private bool _isMonitoring;
         private Timer? _timer;
 
-        // 错误事件
         public event EventHandler<Exception>? OnError;
-        // 剪贴板变化事件委托和事件
-        public delegate void ClipboardChangedEventHandler(ClipboardData data);
-        public event ClipboardChangedEventHandler? OnClipboardChanged;
+        public event IClipboardMonitor.ClipboardChangedEventHandler? OnClipboardChanged;
 
         public ClipboardMonitor(IClipboardHandler clipboardHandler)
         {
@@ -98,6 +95,7 @@ namespace ClipFlow.Desktop.ClipboardHandler
             {
                 disposable.Dispose();
             }
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace ClipFlow.Api.Services
             return Task.CompletedTask;
         }
 
-        private void CleanupExpiredFiles(object? state)
+        private void CleanupExpiredFiles(object state)
         {
             try
             {

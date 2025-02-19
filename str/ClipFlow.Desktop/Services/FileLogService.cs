@@ -1,95 +1,63 @@
 using NLog;
 using System;
 using System.IO;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace ClipFlow.Desktop.Services
 {
     public class FileLogService
     {
-        /// <summary>
-        /// 实例化nLog，即为获取配置文件相关信息(获取以当前正在初始化的类命名的记录器)
-        /// </summary>
-        private readonly NLog.Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger;
 
-        private static FileLogService? _obj;
+        private static readonly Lazy<FileLogService> _lazyInstance = new Lazy<FileLogService>(() => new FileLogService());
 
-        public static FileLogService _
+        public static FileLogService Instance => _lazyInstance.Value;
+
+        private FileLogService()
         {
-            get => _obj ?? (new FileLogService());
-            set => _obj = value;
+            string dynamicLogDirectory = GetLogDirectory();
+            GlobalDiagnosticsContext.Set("logDirectory", dynamicLogDirectory);
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
-        #region Debug，调试
-        public void Debug(string msg)
+        private string GetLogDirectory()
         {
-            _logger.Debug(msg);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ClipFlow/logs");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Library/Application Support/ClipFlow/logs");
+            }
+            else
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".config/clipflow/logs");
+            }
         }
 
-        public void Debug(string msg, Exception err)
+        private void Log(LogLevel level, string msg, Exception? err = null)
         {
-            _logger.Debug(err, msg);
-        }
-        #endregion
-
-        #region Info，信息
-        public void Info(string msg)
-        {
-            _logger.Info(msg);
-        }
-
-        public void Info(string msg, Exception err)
-        {
-            _logger.Info(err, msg);
-        }
-        #endregion
-
-        #region Warn，警告
-        public void Warn(string msg)
-        {
-            _logger.Warn(msg);
+            if (err == null)
+            {
+                _logger.Log(level, msg);
+            }
+            else
+            {
+                _logger.Log(level, err, msg);
+            }
         }
 
-        public void Warn(string msg, Exception err)
-        {
-            _logger.Warn(err, msg);
-        }
-        #endregion
-
-        #region Trace，追踪
-        public void Trace(string msg)
-        {
-            _logger.Trace(msg);
-        }
-
-        public void Trace(string msg, Exception err)
-        {
-            _logger.Trace(err, msg);
-        }
-        #endregion
-
-        #region Error，错误
-        public void Error(string msg)
-        {
-            _logger.Error(msg);
-        }
-
-        public void Error(string msg, Exception err)
-        {
-            _logger.Error(err, msg);
-        }
-        #endregion
-
-        #region Fatal,致命错误
-        public void Fatal(string msg)
-        {
-            _logger.Fatal(msg);
-        }
-
-        public void Fatal(string msg, Exception err)
-        {
-            _logger.Fatal(err, msg);
-        }
-        #endregion
+        public void Debug(string msg, Exception? err = null) => Log(LogLevel.Debug, msg, err);
+        public void Info(string msg, Exception? err = null) => Log(LogLevel.Info, msg, err);
+        public void Warn(string msg, Exception? err = null) => Log(LogLevel.Warn, msg, err);
+        public void Error(string msg, Exception? err = null) => Log(LogLevel.Error, msg, err);
+        public void Fatal(string msg, Exception? err = null) => Log(LogLevel.Fatal, msg, err);
     }
-} 
+}

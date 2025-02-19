@@ -102,7 +102,7 @@
 
 				<controls:SettingItem Title="最大上传文件大小"
 									 BorderThickness="1,1,1,1"
-									  CornerRadius="0"
+									  CornerRadius="0,0,4,4"
 									Description="上传文件的最大大小(MB) (0表示不限制)">
 					<controls:SettingItem.ActionContent>
 						<NumericUpDown Value="{Binding MaxUploadFileSize}"
@@ -112,6 +112,52 @@
 									 Width="150"/>
 					</controls:SettingItem.ActionContent>
 				</controls:SettingItem>
+
+			</StackPanel>
+			<StackPanel>
+				<controls:SettingItem Title="文件后缀过滤"
+							 BorderThickness="1,1,1,0"
+							 CornerRadius="4,4,0,0"
+							 Description="设置允许或禁止的文件后缀">
+					<controls:SettingItem.ActionContent>
+						<ComboBox SelectedIndex="{Binding IsFileExtensionWhitelist}"
+								Width="150">
+							<ComboBoxItem>白名单模式</ComboBoxItem>
+							<ComboBoxItem>黑名单模式</ComboBoxItem>
+						</ComboBox>
+					</controls:SettingItem.ActionContent>
+				</controls:SettingItem>
+				<TextBox Text="{Binding FileExtensions}"
+						Height="100"
+						AcceptsReturn="True"
+						TextWrapping="Wrap"
+						Watermark="输入文件后缀，以逗号分隔，例如exe,png"
+						BorderBrush="#20000000"
+						CornerRadius="0,0,4,4"
+						BorderThickness="1"/>
+			</StackPanel>
+			<StackPanel>
+				<controls:SettingItem Title="进程名过滤(实验性)"
+									 BorderThickness="1,1,1,0"
+									 CornerRadius="4,4,0,0"
+									 Description="设置允许或禁止的进程名">
+					<controls:SettingItem.ActionContent>
+						<ComboBox SelectedIndex="{Binding IsProcessNameWhitelist}"
+								Width="150">
+							<ComboBoxItem>白名单模式</ComboBoxItem>
+							<ComboBoxItem>黑名单模式</ComboBoxItem>
+						</ComboBox>
+					</controls:SettingItem.ActionContent>
+				</controls:SettingItem>
+				<TextBox Text="{Binding ProcessNames}"
+						Height="100"
+						AcceptsReturn="True"
+						TextWrapping="Wrap"
+						Watermark="输入进程名，以逗号分隔，例如：chrome,qq,wechat"
+						BorderBrush="#20000000"
+						CornerRadius="0,0,4,4"
+						BorderThickness="1"/>
+				<Grid Margin="10"></Grid>
 			</StackPanel>
         </StackPanel>
     </ScrollViewer>

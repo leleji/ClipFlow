@@ -9,34 +9,29 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices.JavaScript;
 using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.ClipboardHandler;
-using Avalonia.Markup.Xaml.Templates;
-using System.Text;
-using SkiaSharp;
-using System.IO.Pipes;
-using System.Collections.Generic;
 
 namespace ClipFlow.Desktop.Services
 {
     public class ClipboardSyncService : IClipboardSyncService
     {
         private readonly ConfigService _configService;
+        private readonly INotificationService _notificationService;
         private readonly HttpClient _httpClient;
         private readonly string _clientId = Guid.NewGuid().ToString();
         private CancellationTokenSource? _uploadCancellationTokenSource;
-        private readonly ClipboardMonitor _clipboardMonitor;
+        private readonly IClipboardMonitor _clipboardMonitor;
         private string _baseUrl;
         private string _wsUrl;
         private WebSocketService? _webSocketService;
 
         public event Action<WebSocketState> OnWebSocketStateChanged;
 
-        public ClipboardSyncService(ConfigService configService, IClipboardHandler clipboardHandler)
+        public ClipboardSyncService(ConfigService configService,INotificationService notificationService, IClipboardMonitor clipboardMonitor)
         {
             _configService = configService;
-            
+            _notificationService= notificationService;
+            _clipboardMonitor = clipboardMonitor;
             var handler = new HttpClientHandler
             {
                 MaxRequestContentBufferSize = 524288000 // 500MB
@@ -47,8 +42,7 @@ namespace ClipFlow.Desktop.Services
                 Timeout = TimeSpan.FromMinutes(30)
             };
 
-            _clipboardMonitor = new ClipboardMonitor(clipboardHandler);
-            _clipboardMonitor.OnClipboardChanged += ClipboardMonitor_OnClipboardChanged;
+            clipboardMonitor.OnClipboardChanged += ClipboardMonitor_OnClipboardChanged;
         }
 
         public void Start()
@@ -129,7 +123,7 @@ namespace ClipFlow.Desktop.Services
                     {
                         if (config.EnableDownloadNotification)
                         {
-                            await NotificationService.Instance.ShowNotificationAsync(
+                            await _notificationService.ShowNotificationAsync(
                                 "接收成功",
                                 $"已接收: {clipboardInfo.Description}"
                             );
@@ -147,7 +141,7 @@ namespace ClipFlow.Desktop.Services
             catch (Exception ex)
             {
                 LogService.Instance.AddLog("错误", $"处理通知失败: {ex.Message}");
-                await NotificationService.Instance.ShowNotificationAsync(
+                await _notificationService.ShowNotificationAsync(
                 "接收异常",
                 $"{ex.Message}"
             );
@@ -259,6 +253,23 @@ namespace ClipFlow.Desktop.Services
                 return false;
             }
 
+            // 进程名筛选
+            if (!string.IsNullOrEmpty(config.ProcessNames))
+            {
+                var processNames = config.ProcessNames.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var isProcessAllowed = processNames.Contains(data.ProcessName, StringComparer.OrdinalIgnoreCase);
+                if (config.IsProcessNameWhitelist && isProcessAllowed)
+                {
+                    LogService.Instance.AddLog("提示", $"进程 {data.ProcessName} 在黑名单中");
+                    return false;
+                }
+                else if (!config.IsProcessNameWhitelist && !isProcessAllowed)
+                {
+                    LogService.Instance.AddLog("提示", $"进程 {data.ProcessName} 不在白名单中");
+                    return false;
+                }
+            }
+
             switch (data.Type)
             {
                 case ClipboardType.Text:
@@ -275,6 +286,28 @@ namespace ClipFlow.Desktop.Services
                     break;
 
                 case ClipboardType.File:
+                    // 文件后缀筛选
+                    if (!string.IsNullOrEmpty(config.FileExtensions))
+                    {
+                        var extensions = config.FileExtensions.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                            .Select(ext => ext.StartsWith(".") ? ext.ToLower() : "." + ext.ToLower())
+                            .ToList();
+                        
+                        var fileExtension = Path.GetExtension(data.FileName).ToLower();
+                        var isExtensionAllowed = extensions.Contains(fileExtension);
+
+                        if (config.IsFileExtensionWhitelist && isExtensionAllowed)
+                        {
+                            LogService.Instance.AddLog("提示", $"文件后缀 {fileExtension} 在黑名单中");
+                            return false;
+                        }
+                        else if (!config.IsFileExtensionWhitelist && !isExtensionAllowed)
+                        {
+                            LogService.Instance.AddLog("提示", $"文件后缀 {fileExtension} 不在白名单中");
+                            return false;
+                        }
+                    }
+
                     if (IsImageFile(data.FileName))
                     {
                         if (!config.EnableUploadImage)
@@ -329,8 +362,12 @@ namespace ClipFlow.Desktop.Services
         {
             if (_uploadCancellationTokenSource != null)
             {
-                _uploadCancellationTokenSource.Cancel();
-                _uploadCancellationTokenSource.Dispose();
+                try
+                {
+                    _uploadCancellationTokenSource.Cancel();
+                    _uploadCancellationTokenSource.Dispose();
+                }
+                catch  {}
             }
             if (!CheckSyncUploadsRestrictions(data))
             {
@@ -392,11 +429,11 @@ namespace ClipFlow.Desktop.Services
                                 }
                                 throw new HttpRequestException($"{resjson.Code} - {resjson.Message}");
                             }
-                            LogService.Instance.AddLog("上传", resjson.Message);
+                            LogService.Instance.AddLog("上传",$"{resjson.Message} {data.ProcessName}" );
 
                             if (_configService.CurrentConfig.EnableUploadNotification)
                             {
-                                await NotificationService.Instance.ShowNotificationAsync(
+                                await _notificationService.ShowNotificationAsync(
                                     "上传成功",
                                     $"已上传: {data.Description}"
                                 );

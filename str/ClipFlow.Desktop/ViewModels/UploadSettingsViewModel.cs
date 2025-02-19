@@ -29,7 +29,19 @@ namespace ClipFlow.Desktop.ViewModels
         private int maxUploadFileSize;
 
         [ObservableProperty]
-        private bool _enableUploadNotification;
+        private bool enableUploadNotification;
+
+        [ObservableProperty]
+        private bool isFileExtensionWhitelist;
+
+        [ObservableProperty]
+        private string fileExtensions = string.Empty;
+
+        [ObservableProperty]
+        private bool isProcessNameWhitelist;
+
+        [ObservableProperty]
+        private string processNames = string.Empty;
 
         public UploadSettingsViewModel(ConfigService configService)
         {
@@ -46,7 +58,11 @@ namespace ClipFlow.Desktop.ViewModels
             EnableUploadMultiple = _configService.CurrentConfig.EnableUploadMultiple;
             MaxTextLength = _configService.CurrentConfig.MaxTextLength;
             MaxUploadFileSize = _configService.CurrentConfig.MaxUploadFileSize;
-            _enableUploadNotification = _configService.CurrentConfig.EnableUploadNotification;
+            EnableUploadNotification = _configService.CurrentConfig.EnableUploadNotification;
+            IsFileExtensionWhitelist = _configService.CurrentConfig.IsFileExtensionWhitelist;
+            FileExtensions = _configService.CurrentConfig.FileExtensions;
+            IsProcessNameWhitelist = _configService.CurrentConfig.IsProcessNameWhitelist;
+            ProcessNames = _configService.CurrentConfig.ProcessNames;
         }
 
         partial void OnEnableUploadChanged(bool value)
@@ -94,6 +110,30 @@ namespace ClipFlow.Desktop.ViewModels
         partial void OnEnableUploadNotificationChanged(bool value)
         {
             _configService.CurrentConfig.EnableUploadNotification = value;
+            _configService.SaveConfig();
+        }
+
+        partial void OnIsFileExtensionWhitelistChanged(bool value)
+        {
+            _configService.CurrentConfig.IsFileExtensionWhitelist = value;
+            _configService.SaveConfig();
+        }
+
+        partial void OnFileExtensionsChanged(string value)
+        {
+            _configService.CurrentConfig.FileExtensions = value;
+            _configService.SaveConfig();
+        }
+
+        partial void OnIsProcessNameWhitelistChanged(bool value)
+        {
+            _configService.CurrentConfig.IsProcessNameWhitelist = value;
+            _configService.SaveConfig();
+        }
+
+        partial void OnProcessNamesChanged(string value)
+        {
+            _configService.CurrentConfig.ProcessNames = value;
             _configService.SaveConfig();
         }
     }

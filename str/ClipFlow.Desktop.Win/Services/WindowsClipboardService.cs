@@ -4,26 +4,39 @@ using ClipFlow.Desktop.Utilities;
 using ClipFlow.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static System.Windows.Forms.DataFormats;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace ClipFlow.Desktop.Win.Services
 {
     public class WindowsClipboardService : IClipboardHandler
     {
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+
+
+
         private string? _lastHash;
         private bool _isSettingClipboard;
         private bool _isServerUpdate;
 
-        public async Task<ClipboardData?> GetContentAsync()
+        public  ClipboardData? GetContentAsync()
         {
             if (_isSettingClipboard) return null;
 
@@ -39,31 +52,42 @@ namespace ClipFlow.Desktop.Win.Services
                     _lastHash = filesHash;
                     if (list.Count == 1 && !Directory.Exists(list[0]))
                     {
-                        return ProcessSingleFile(list[0]);
+                        return ClipboardProcess.ProcessSingleFile(list[0], GetProcessName());
                     }
-                    return ProcessMultipleItems(list);
+                    return ClipboardProcess.ProcessMultipleItems(list, GetProcessName());
 
                 }else if (Clipboard.ContainsText())
                 {
-                    var text =  Clipboard.GetText();
+                    var text = Clipboard.GetText();
                     if (string.IsNullOrEmpty(text)) return null;
                     var textHash = ClipboardUtils.GetMd5Hash(text);
                     if (textHash == _lastHash) return null;
                     _lastHash = textHash;
-                    return ProcessText(text);
+                    return ClipboardProcess.ProcessText(text, GetProcessName());
                 }
                 else if (Clipboard.ContainsImage())
                 {
-                    //var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
-                    ////本地没有存储的图片
-                    //using var img = Clipboard.GetImage();
-                    //img?.Save(tempPath, ImageFormat.Png);
-                    //return ProcessSingleFile(tempPath);
+                    if (Clipboard.ContainsData("HTML Format")) {
+                        var format = Clipboard.GetData("HTML Format")?.ToString();
+                        var textHash = ClipboardUtils.GetMd5Hash(format);
+                        if (textHash == _lastHash) return null;
+                        _lastHash = textHash;
+                        var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
+                        //本地没有存储的图片
+                        using var img = Clipboard.GetImage();
+                        img?.Save(tempPath, ImageFormat.Png);
+                        return ClipboardProcess.ProcessSingleFile(tempPath, GetProcessName());
+                    }
+                    else
+                    {
+                        var formats = Clipboard.GetDataObject()?.GetFormats();
+                        FileLogService.Instance.Error($"图片无法生成Hash:{string.Join(",", formats)}");
+                    }
                 }
                 else
                 {
                     var formats = Clipboard.GetDataObject()?.GetFormats();
-                    FileLogService._.Error($"无法获取剪贴板数据对象:{string.Join(",", formats)}");
+                    FileLogService.Instance.Error($"无法获取剪贴板数据对象:{string.Join(",", formats)}");
                 }
             }
             catch (Exception ex)
@@ -74,10 +98,24 @@ namespace ClipFlow.Desktop.Win.Services
             return null;
         }
 
+        public string GetProcessName()
+        {
+            try
+            {
+                IntPtr hwnd = GetForegroundWindow(); // 获取当前窗口句柄
+                GetWindowThreadProcessId(hwnd, out uint processId); // 获取进程ID
+                Process process = Process.GetProcessById((int)processId); // 通过ID获取进程
+                return process.ProcessName;
+            }
+            catch (Exception ex)
+            {
+                FileLogService.Instance.Error("获取进程信息异常",ex);
+                return string.Empty;
+            }
+        }
+
         public async Task<bool> SetContentAsync(ClipboardData data, bool isServerUpdate = true)
         {
-
-            ;
             try
             {
                 _isSettingClipboard = true;
@@ -118,44 +156,8 @@ namespace ClipFlow.Desktop.Win.Services
             return true;
         }
 
-        private ClipboardData ProcessSingleFile(string file)
-        {
-            FileInfo fileInfo = new FileInfo(file);
-            return new ClipboardData
-            {
-                Type = ClipboardType.File,
-                FileName = fileInfo.Name,
-                FilenameList = new List<string> { file },
-                DataLength = (ulong)file.Length,
-                Description = $"单文件: {fileInfo.Name}"
-            };
-        }
+  
 
-        private ClipboardData ProcessMultipleItems(List<string> files)
-        {
-            ulong totalSize = (ulong)ClipboardUtils.GetTotalSize(files);
-            return new ClipboardData
-            {
-                Type = ClipboardType.FileList,
-                FilenameList = files,
-                FileName = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
-                DataLength = totalSize,
-                Description = $"{files.Count} 个文件: {string.Join(", ", files.Select(path => Path.GetFileName(path.TrimEnd('\\'))).Take(5))}"
-            };
-        }
-
-        private ClipboardData? ProcessText(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return null;
-
-            return new ClipboardData
-            {
-                Type = ClipboardType.Text,
-                Text = text,
-                Data= Encoding.UTF8.GetBytes(text),
-                Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text)
-            };
-        }
 
 
         public void Initialize()

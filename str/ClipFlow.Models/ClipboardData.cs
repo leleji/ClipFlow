@@ -28,6 +28,10 @@ namespace ClipFlow.Models
         public byte[] Data { get; set; }
 
         public string FileName { get; set; }
+        /// <summary>
+        /// 进程名
+        /// </summary>
+        public string ProcessName { get; set; }
     }
 
 

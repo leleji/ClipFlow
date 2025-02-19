@@ -49,20 +49,6 @@
 					</controls:SettingItem.ActionContent>
 				</controls:SettingItem>
 
-				<controls:SettingItem Title="下载图片"
-									  BorderThickness="1,1,1,0"
-									  CornerRadius="0"
-											
-									Description="允许同步服务器的图片文件">
-					<controls:SettingItem.ActionContent>
-						<ToggleSwitch IsChecked="{Binding EnableDownloadImage}"
-									IsEnabled="{Binding EnableDownload}"
-									OnContent=""
-									OffContent=""
-									Margin="0,-6,0,-6"/>
-					</controls:SettingItem.ActionContent>
-				</controls:SettingItem>
-
 				<controls:SettingItem Title="下载文件"
 									  BorderThickness="1,1,1,0"
 									  CornerRadius="0"
@@ -78,7 +64,7 @@
 				</controls:SettingItem>
 				<controls:SettingItem Title="最大同步下载文件大小"
 									  BorderThickness="1,1,1,1"
-									  CornerRadius="0"
+									  CornerRadius="0,0,4,4"
 											
 			Description="下载文件的最大大小(MB) (0表示不限制)">
 					<controls:SettingItem.ActionContent>

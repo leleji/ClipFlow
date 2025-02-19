@@ -56,7 +56,7 @@ namespace ClipFlow.Desktop.Services
             }
             catch (Exception ex)
             {
-                FileLogService._.Error($"创建配置目录失败: {configDir}", ex);
+                FileLogService.Instance.Error($"创建配置目录失败: {configDir}", ex);
             }
 
             return Path.Combine(configDir, "config.json");
@@ -96,45 +96,17 @@ namespace ClipFlow.Desktop.Services
                         }
                         catch (Exception ex)
                         {
-                            FileLogService._.Error("迁移旧配置失败", ex);
+                            FileLogService.Instance.Error("迁移旧配置失败", ex);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                FileLogService._.Error($"加载配置失败: {_configPath}", ex);
+                FileLogService.Instance.Error($"加载配置失败: {_configPath}", ex);
             }
 
-            return new Config
-            {
-                // 基本设置默认值
-                MinimizeToTray = true,
-                HideOnStartup = false,
-                AutoStart = false,
-
-                // 上传设置默认值
-                EnableUpload = true,
-                EnableUploadText = true,
-                EnableUploadFile = true,
-                EnableUploadImage = true,
-                EnableUploadMultiple = true,
-
-                // 下载设置默认值
-                EnableDownload = true,
-                EnableDownloadText = true,
-                EnableDownloadFile = true,
-                EnableDownloadImage = true,
-
-                // 限制设置默认值
-                MaxTextLength = 0,
-                MaxUploadFileSize = 0,
-                MaxDownloadFileSize = 0,
-
-                // 通知设置默认值
-                EnableUploadNotification = true,
-                EnableDownloadNotification = true
-            };
+            return new Config();
         }
 
         public void SaveConfig()
@@ -174,7 +146,7 @@ namespace ClipFlow.Desktop.Services
             }
             catch (Exception ex)
             {
-                FileLogService._.Error($"保存配置失败: {_configPath}", ex);
+                FileLogService.Instance.Error($"保存配置失败: {_configPath}", ex);
                 throw;
             }
         }

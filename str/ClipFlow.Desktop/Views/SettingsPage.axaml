@@ -42,15 +42,6 @@
 					</ComboBox>
 				</controls:SettingItem.ActionContent>
 			</controls:SettingItem>
-			<controls:SettingItem Title="启动时隐藏窗口"
-                                 Description="启动后自动最小化到系统托盘">
-				<controls:SettingItem.ActionContent>
-					<ToggleSwitch IsChecked="{Binding HideOnStartup}"
-                                 OnContent=""
-                                 OffContent=""
-                                 Margin="0,-6,0,-6"/>
-				</controls:SettingItem.ActionContent>
-			</controls:SettingItem>
 		</StackPanel>
 	</ScrollViewer>
 </UserControl>
