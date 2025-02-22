@@ -36,12 +36,18 @@ namespace ClipFlow.Desktop
             // 获取服务
             var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
             var clipboardSyncService = AppServices.ServiceProvider.GetRequiredService<IClipboardSyncService>();
+            var notificationService = AppServices.ServiceProvider.GetRequiredService<INotificationService>();
+            // 初始化服务
+            notificationService.Initialize();
             // 如果需要启动服务
             if (configService.CurrentConfig.IsEnabled)
             {
                 clipboardSyncService.Start();
             }
+#if DEBUG
             Show();
+#endif
+            
             base.OnFrameworkInitializationCompleted();
         }
         bool isLoadingShow = false;

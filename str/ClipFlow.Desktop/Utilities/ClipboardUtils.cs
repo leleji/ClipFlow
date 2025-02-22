@@ -16,11 +16,14 @@ namespace ClipFlow.Desktop.Utilities
     {
         public static string GetMd5Hash(string input)
         {
+            return GetMd5Hash(Encoding.UTF8.GetBytes(input));
+        }
+        public static string GetMd5Hash(byte[] input)
+        {
             using var md5Hash = MD5.Create();
-            var bytes = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+            var bytes = md5Hash.ComputeHash(input);
             return BitConverter.ToString(bytes).ToLower();
         }
-
         public static StringCollection ExtractZipArchive(string zipFilePath)
         {
             var extractedPaths = new StringCollection();

@@ -13,33 +13,22 @@ namespace ClipFlow.Desktop.Windows.Services
     {
         private bool _isInitialized;
         private const string APP_NAME = "ClipFlow";
-
-        public WindowsNotificationService()
-        {
-            Initialize();
-        }
+        
 
         public void Initialize()
         {
+            // 清理旧通知
             try
             {
-                // 清理旧通知
-                try
-                {
-                    ToastNotificationManagerCompat.History.Clear();
-                }
-                catch (Exception ex)
-                {
-                    FileLogService.Instance.Error("清理旧通知失败，但不影响使用", ex);
-                }
-
-                _isInitialized = true;
-                FileLogService.Instance.Info("Windows通知服务初始化成功");
+                ToastNotificationManagerCompat.History.Clear();
             }
             catch (Exception ex)
             {
-                FileLogService.Instance.Error("初始化 Windows 通知失败", ex);
+                FileLogService.Instance.Error("清理旧通知失败，但不影响使用", ex);
             }
+
+            _isInitialized = true;
+            FileLogService.Instance.Info("Windows通知服务初始化成功");
         }
 
         public async Task ShowNotificationAsync(string title, string message)

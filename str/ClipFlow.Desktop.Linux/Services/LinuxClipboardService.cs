@@ -44,7 +44,7 @@ namespace ClipFlow.Desktop.Linux.Services
                         var bytes = await _clipboard.GetDataAsync(ClipboardFormat.LinuxFile) as byte[];
                         if (bytes != null)
                         {
-                            var content = Encoding.UTF8.GetString(bytes);
+                            var content =System.Web.HttpUtility.UrlDecode( Encoding.UTF8.GetString(bytes));
                             var pathList = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None)
                                 .Select(v => v.Trim().Replace("file://", ""))
                                 .Where(x => !string.IsNullOrEmpty(x))
@@ -62,56 +62,48 @@ namespace ClipFlow.Desktop.Linux.Services
                     }
                     else if (formats.Contains(ClipboardFormat.ImagePng) || formats.Contains(ClipboardFormat.ImageJpegt) || formats.Contains(ClipboardFormat.ImageBmp))
                     {
-                        if (formats.Contains(ClipboardFormat.Html))
+                        var imgformat = formats.FirstOrDefault(f => f.StartsWith("image/"));
+                        if (!string.IsNullOrEmpty(imgformat))
                         {
-                            var htmlformat = await _clipboard.GetDataAsync(ClipboardFormat.Html) as string;
-
-                            var textHash = ClipboardUtils.GetMd5Hash(htmlformat);
-                            if (textHash == _lastHash) return null;
-                            _lastHash = textHash;
-                            var imgformat = formats.FirstOrDefault(f => f.StartsWith("image/"));
-                            if (!string.IsNullOrEmpty(imgformat))
+                            var imageData = await _clipboard.GetDataAsync(imgformat) as byte[];
+                            if (imageData != null && imageData.Length > 0)
                             {
-                                var imageData = await _clipboard.GetDataAsync(imgformat) as byte[];
-                                if (imageData != null && imageData.Length > 0)
+                                var textHash = ClipboardUtils.GetMd5Hash(imageData);
+                                if (textHash == _lastHash) return null;
+                                _lastHash = textHash;
+                                string extension = imgformat.Split('/')[1]; // png, jpeg, bmp
+                                var tempPath = Path.Combine(Path.GetTempPath(), $"ClipFlow{Path.DirectorySeparatorChar}{Guid.NewGuid()}.{extension}");
+                                try
                                 {
-                                    string extension = imgformat.Split('/')[1];  // png, jpeg, bmp
-                                    var tempPath = Path.Combine(Path.GetTempPath(), $"clipboard_image.{extension}");
-                                    try
-                                    {
-                                        File.WriteAllBytes(tempPath, imageData);
-                                        Console.WriteLine($"图片已保存为: {Path.GetFullPath(tempPath)}");
-                                        return ClipboardProcess.ProcessSingleFile(tempPath, "");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"保存图片失败: {ex.Message}");
-                                    }
+                                    File.WriteAllBytes(tempPath, imageData);
+                                    Console.WriteLine($"图片已保存为: {Path.GetFullPath(tempPath)}");
+                                    return ClipboardProcess.ProcessSingleFile(tempPath, "");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"保存图片失败: {ex.Message}");
                                 }
                             }
-                            else
-                            {
-                                FileLogService.Instance.Error($"图片无法生成Hash:{string.Join(",", formats)}");
-                            }
                         }
-                        else if (formats.Contains("UTF8_STRING") || formats.Contains(ClipboardFormat.Text) || formats.Contains("STRING"))
-                        {
-                            var text = await _clipboard.GetTextAsync();
-                            if (string.IsNullOrEmpty(text)) return null;
+                    }else if (formats.Contains("UTF8_STRING") || formats.Contains(ClipboardFormat.Text) || formats.Contains("STRING"))
+                    {
+                        var text = await _clipboard.GetTextAsync();
+                        if (string.IsNullOrEmpty(text)) return null;
 
-                            var textHash = ClipboardUtils.GetMd5Hash(text);
-                            if (textHash == _lastHash) return null;
-                            _lastHash = textHash;
-                            return ClipboardProcess.ProcessText(text);
-                        }
+                        var textHash = ClipboardUtils.GetMd5Hash(text);
+                        if (textHash == _lastHash) return null;
+                        _lastHash = textHash;
+                        return ClipboardProcess.ProcessText(text);
                     }
                 }
             }
             catch (Exception ex)
             {
                 LogService.Instance.AddLog("错误", $"获取剪贴板内容失败: {ex.Message}");
+            }finally
+            {
+                _isSettingClipboard = false;
             }
-            _isSettingClipboard = false;
             return null;
         }
 

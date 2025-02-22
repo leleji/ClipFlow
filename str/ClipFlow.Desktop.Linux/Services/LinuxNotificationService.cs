@@ -39,32 +39,9 @@ namespace ClipFlow.Desktop.Linux.Services
                     }
                     else
                     {
-                        // 测试通知
-                        using var testProcess = Process.Start(new ProcessStartInfo
-                        {
-                            FileName = _notifySendPath,
-                            Arguments = $"--app-name=\"{APP_NAME}\" \"初始化成功\" \"通知服务已准备就绪\" --icon=dialog-information",
-                            UseShellExecute = false,
-                            RedirectStandardError = true,
-                            CreateNoWindow = true
-                        });
-
-                        if (testProcess != null)
-                        {
-                            var error = testProcess.StandardError.ReadToEnd();
-                            testProcess.WaitForExit();
-
-                            if (!string.IsNullOrEmpty(error))
-                            {
-                                _isInitialized = false;
-                                FileLogService.Instance.Error($"通知服务测试失败: {error}");
-                            }
-                            else
-                            {
-                                FileLogService.Instance.Info("Linux通知服务初始化成功");
-                            }
-                        }
+                        FileLogService.Instance.Info("Linux通知服务初始化成功");
                     }
+                    
                 }
             }
             catch (Exception ex)
