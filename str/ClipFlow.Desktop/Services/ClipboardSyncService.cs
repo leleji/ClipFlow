@@ -400,14 +400,14 @@ namespace ClipFlow.Desktop.Services
                                 break;
 
                             case ClipboardType.File:
-                                CompressionEncryptor.EncryptClipboardDataToTemporaryFile(data.FilenameList[0], data, _configService.CurrentConfig.DataKey);
+                                CompressionEncryptor.EncryptClipboardDataToTemporaryFile(data.CopyFiles[0], data, _configService.CurrentConfig.DataKey);
                                 content = new StreamContent(new FileStream($"{tempPath}.dat", FileMode.Open, FileAccess.Read));
                                 break;
 
                             case ClipboardType.FileList:
                                 using (var archive = ZipFile.Open($"{tempPath}", ZipArchiveMode.Create))
                                 {
-                                    await ClipboardUtils.CreateZipArchive(archive, data.FilenameList);
+                                    await ClipboardUtils.CreateZipArchive(archive, data.CopyFiles);
                                 }
                                 CompressionEncryptor.EncryptClipboardDataToTemporaryFile($"{tempPath}", data, _configService.CurrentConfig.DataKey);
                                 content = new StreamContent(new FileStream($"{tempPath}.dat", FileMode.Open, FileAccess.Read));

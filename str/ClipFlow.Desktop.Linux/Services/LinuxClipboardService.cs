@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using ClipFlow.Desktop.Constants;
 using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Desktop.Utilities;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +21,7 @@ namespace ClipFlow.Desktop.Linux.Services
 {
     public class LinuxClipboardService : IClipboardHandler
     {
-        private const string _fileFormat = "text/uri-list";
+
         private string? _lastHash;
         private bool _isSettingClipboard;
         private bool _isServerUpdate;
@@ -28,21 +30,22 @@ namespace ClipFlow.Desktop.Linux.Services
 
         public async Task<ClipboardData?> GetContentAsync()
         {
+            
             if (_isSettingClipboard) return null;
-
+            _isSettingClipboard=true;
             try
             {
                 if (_clipboard != null)
                 {
                     var formats = await _clipboard.GetFormatsAsync();
-                    
-                    if (formats.Contains(_fileFormat))
+
+                    if (formats.Contains(ClipboardFormat.LinuxFile))
                     {
-                        var bytes = await _clipboard.GetDataAsync(_fileFormat) as byte[];
+                        var bytes = await _clipboard.GetDataAsync(ClipboardFormat.LinuxFile) as byte[];
                         if (bytes != null)
                         {
                             var content = Encoding.UTF8.GetString(bytes);
-                            var pathList = content.Split([ "\r\n", "\r", "\n" ], StringSplitOptions.None)
+                            var pathList = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None)
                                 .Select(v => v.Trim().Replace("file://", ""))
                                 .Where(x => !string.IsNullOrEmpty(x))
                                 .ToList();
@@ -57,15 +60,50 @@ namespace ClipFlow.Desktop.Linux.Services
                         }
 
                     }
-                    else
+                    else if (formats.Contains(ClipboardFormat.ImagePng) || formats.Contains(ClipboardFormat.ImageJpegt) || formats.Contains(ClipboardFormat.ImageBmp))
                     {
-                        var text = await _clipboard.GetTextAsync();
-                        if (string.IsNullOrEmpty(text)) return null;
-                        
-                        var textHash = ClipboardUtils.GetMd5Hash(text);
-                        if (textHash == _lastHash) return null;
-                        _lastHash = textHash;
-                        return ClipboardProcess.ProcessText(text);
+                        if (formats.Contains(ClipboardFormat.Html))
+                        {
+                            var htmlformat = await _clipboard.GetDataAsync(ClipboardFormat.Html) as string;
+
+                            var textHash = ClipboardUtils.GetMd5Hash(htmlformat);
+                            if (textHash == _lastHash) return null;
+                            _lastHash = textHash;
+                            var imgformat = formats.FirstOrDefault(f => f.StartsWith("image/"));
+                            if (!string.IsNullOrEmpty(imgformat))
+                            {
+                                var imageData = await _clipboard.GetDataAsync(imgformat) as byte[];
+                                if (imageData != null && imageData.Length > 0)
+                                {
+                                    string extension = imgformat.Split('/')[1];  // png, jpeg, bmp
+                                    var tempPath = Path.Combine(Path.GetTempPath(), $"clipboard_image.{extension}");
+                                    try
+                                    {
+                                        File.WriteAllBytes(tempPath, imageData);
+                                        Console.WriteLine($"图片已保存为: {Path.GetFullPath(tempPath)}");
+                                        return ClipboardProcess.ProcessSingleFile(tempPath, "");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"保存图片失败: {ex.Message}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                FileLogService.Instance.Error($"图片无法生成Hash:{string.Join(",", formats)}");
+                            }
+                        }
+                        else if (formats.Contains("UTF8_STRING") || formats.Contains(ClipboardFormat.Text) || formats.Contains("STRING"))
+                        {
+                            var text = await _clipboard.GetTextAsync();
+                            if (string.IsNullOrEmpty(text)) return null;
+
+                            var textHash = ClipboardUtils.GetMd5Hash(text);
+                            if (textHash == _lastHash) return null;
+                            _lastHash = textHash;
+                            return ClipboardProcess.ProcessText(text);
+                        }
                     }
                 }
             }
@@ -73,7 +111,7 @@ namespace ClipFlow.Desktop.Linux.Services
             {
                 LogService.Instance.AddLog("错误", $"获取剪贴板内容失败: {ex.Message}");
             }
-
+            _isSettingClipboard = false;
             return null;
         }
 
@@ -132,16 +170,16 @@ namespace ClipFlow.Desktop.Linux.Services
             var dataObject = new DataObject();
 
             // 设置纯文本格式
-            dataObject.Set("Text", Encoding.UTF8.GetBytes(string.Join('\n', data.FilenameList)));
+            dataObject.Set(ClipboardFormat.Text, Encoding.UTF8.GetBytes(string.Join('\n', data.CopyFiles)));
 
             // 设置URI列表格式
             var uriEnum = data.CopyFiles.Cast<string>().Select(file => new Uri(file).GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped));
             var uris = string.Join("\n", uriEnum);
-            dataObject.Set("text/uri-list", Encoding.UTF8.GetBytes(uris));
+            dataObject.Set(ClipboardFormat.LinuxFile, Encoding.UTF8.GetBytes(uris));
 
             // 设置GNOME格式
             var nautilus = $"x-special/nautilus-clipboard\ncopy\n{uris}\n";
-            dataObject.Set(_fileFormat, Encoding.UTF8.GetBytes(nautilus));
+            dataObject.Set(ClipboardFormat.GnomeFiles, Encoding.UTF8.GetBytes(nautilus));
 
             return dataObject;
         }

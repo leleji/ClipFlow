@@ -2,6 +2,7 @@
 using ClipFlow.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,30 +33,21 @@ namespace ClipFlow.Desktop.Utilities
                 Type = ClipboardType.File,
                 FileName = fileInfo.Name,
                 ProcessName = processName,
-                FilenameList = new List<string> { file },
+                CopyFiles = [file],
                 DataLength = (ulong)file.Length,
                 Description = $"单文件: {fileInfo.Name}"
-            };
-        }
-        public async Task<ClipboardData> ProcessSingleFile(IStorageItem file)
-        {
-            return new ClipboardData
-            {
-                Type = ClipboardType.File,
-                FileName = file.Name,
-                FilenameList = new List<string> { file.Path.LocalPath },
-                DataLength = (await file.GetBasicPropertiesAsync()).Size,
-                Description = $"单文件: {file.Name}"
             };
         }
         public static ClipboardData? ProcessMultipleItems(List<string> files, string processName = "")
         {
             if (!files.Any()) return null;
             ulong totalSize = (ulong)ClipboardUtils.GetTotalSize(files);
+            var cpfile=new StringCollection();
+            cpfile.AddRange(files.ToArray());
             return new ClipboardData
             {
                 Type = ClipboardType.FileList,
-                FilenameList = files,
+                CopyFiles = cpfile,
                 ProcessName = processName,
                 FileName = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
                 DataLength = totalSize,

@@ -23,7 +23,6 @@ namespace ClipFlow.Models
 
         public ulong? DataLength { get; set; }
 
-        public List<string> FilenameList { get; set; }
 
 
         public string FileName { get; set; }

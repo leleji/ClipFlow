@@ -94,7 +94,7 @@ namespace ClipFlow.Desktop.Utilities
             return extractedPaths;
         }
 
-        public static async Task CreateZipArchive(ZipArchive archive, IEnumerable<string> paths)
+        public static async Task CreateZipArchive(ZipArchive archive, StringCollection paths)
         {
             // 找到所有路径的共同父目录
             var commonParent = GetCommonParentPath(paths);
@@ -172,18 +172,18 @@ namespace ClipFlow.Desktop.Utilities
             }
         }
 
-        private static string GetCommonParentPath(IEnumerable<string> paths)
+        private static string GetCommonParentPath(StringCollection paths)
         {
-            var pathArray = paths.ToArray();
-            if (pathArray.Length == 0) return string.Empty;
-            if (pathArray.Length == 1) return Path.GetDirectoryName(pathArray[0])!;
+ 
+            if (paths.Count == 0) return string.Empty;
+            if (paths.Count == 1) return Path.GetDirectoryName(paths[0])!;
 
-            var firstPath = pathArray[0];
+            var firstPath = paths[0];
             var commonParent = Path.GetDirectoryName(firstPath)!;
 
             while (!string.IsNullOrEmpty(commonParent))
             {
-                if (pathArray.All(p => p.StartsWith(commonParent, StringComparison.OrdinalIgnoreCase)))
+                if (paths.Cast<string>().All(p => p.StartsWith(commonParent, StringComparison.OrdinalIgnoreCase)))
                 {
                     return commonParent;
                 }

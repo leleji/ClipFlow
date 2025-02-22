@@ -1,3 +1,4 @@
+using ClipFlow.Desktop.Constants;
 using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Desktop.Utilities;
@@ -42,9 +43,8 @@ namespace ClipFlow.Desktop.Windows.Services
 
             try
             {
-               
                 //包含FileDrop的都是文件，包括有些图片
-                if (Clipboard.ContainsData("FileDrop"))
+                if (Clipboard.ContainsFileDropList())
                 {
                     var list = new List<string>(Clipboard.GetFileDropList().Cast<string>());
                     var filesHash = ClipboardUtils.GetMd5Hash(string.Join("|", list));
@@ -67,8 +67,8 @@ namespace ClipFlow.Desktop.Windows.Services
                 }
                 else if (Clipboard.ContainsImage())
                 {
-                    if (Clipboard.ContainsData("HTML Format")) {
-                        var format = Clipboard.GetData("HTML Format")?.ToString();
+                    if (Clipboard.ContainsData(ClipboardFormat.Html)) {
+                        var format = Clipboard.GetData(ClipboardFormat.Html)?.ToString();
                         var textHash = ClipboardUtils.GetMd5Hash(format);
                         if (textHash == _lastHash) return null;
                         _lastHash = textHash;
