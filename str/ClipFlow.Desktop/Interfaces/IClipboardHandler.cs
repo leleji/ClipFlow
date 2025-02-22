@@ -6,7 +6,7 @@ namespace ClipFlow.Desktop.Interfaces
     public interface IClipboardHandler
     {
         Task<bool> SetContentAsync(ClipboardData data, bool isServerUpdate = true);
-        ClipboardData? GetContentAsync();
+        Task<ClipboardData?> GetContentAsync();
         
         void Initialize();
         void Cleanup();

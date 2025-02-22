@@ -2,9 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.Services;
+using ClipFlow.Desktop.Utilities;
 using ClipFlow.Models;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,12 @@ namespace ClipFlow.Desktop.Linux.Services
 {
     public class LinuxClipboardService : IClipboardHandler
     {
-        private const string FileFormat = "x-special/gnome-copied-files";
+        private const string _fileFormat = "text/uri-list";
         private string? _lastHash;
         private bool _isSettingClipboard;
         private bool _isServerUpdate;
+
+        private IClipboard? _clipboard;
 
         public async Task<ClipboardData?> GetContentAsync()
         {
@@ -28,43 +32,40 @@ namespace ClipFlow.Desktop.Linux.Services
 
             try
             {
-                if (App.Clipboard != null)
+                if (_clipboard != null)
                 {
-                    var clipboard = App.Clipboard;
-                    var formats = await clipboard.GetFormatsAsync();
+                    var formats = await _clipboard.GetFormatsAsync();
                     
-                    if (formats.Contains(FileFormat))
+                    if (formats.Contains(_fileFormat))
                     {
-                        var bytes = await clipboard.GetDataAsync(FileFormat) as byte[];
+                        var bytes = await _clipboard.GetDataAsync(_fileFormat) as byte[];
                         if (bytes != null)
                         {
-                            var str = Encoding.UTF8.GetString(bytes);
-                            var pathList = str.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
-                                            .Where(x => !string.IsNullOrEmpty(x))
-                                            .ToArray();
-
-                            if (pathList.Length > 1)
+                            var content = Encoding.UTF8.GetString(bytes);
+                            var pathList = content.Split([ "\r\n", "\r", "\n" ], StringSplitOptions.None)
+                                .Select(v => v.Trim().Replace("file://", ""))
+                                .Where(x => !string.IsNullOrEmpty(x))
+                                .ToList();
+                            var filesHash = ClipboardUtils.GetMd5Hash(string.Join("|", pathList));
+                            if (filesHash == _lastHash) return null;
+                            _lastHash = filesHash;
+                            if (pathList.Count == 1 && !Directory.Exists(pathList[0]))
                             {
-                                var files = await GetStorageItems(pathList.Skip(1));
-                                if (files.Any())
-                                {
-                                    var filesHash = GetMd5Hash(string.Join("|", files.Select(f => f.Path.LocalPath)));
-                                    if (filesHash == _lastHash) return null;
-                                    _lastHash = filesHash;
-                                    return await ProcessFiles(files);
-                                }
+                                return ClipboardProcess.ProcessSingleFile(pathList[0]);
                             }
+                            return ClipboardProcess.ProcessMultipleItems(pathList);
                         }
+
                     }
                     else
                     {
-                        var text = await clipboard.GetTextAsync();
+                        var text = await _clipboard.GetTextAsync();
                         if (string.IsNullOrEmpty(text)) return null;
                         
-                        var textHash = GetMd5Hash(text);
+                        var textHash = ClipboardUtils.GetMd5Hash(text);
                         if (textHash == _lastHash) return null;
                         _lastHash = textHash;
-                        return ProcessText(text);
+                        return ClipboardProcess.ProcessText(text);
                     }
                 }
             }
@@ -83,36 +84,26 @@ namespace ClipFlow.Desktop.Linux.Services
                 _isSettingClipboard = true;
                 _isServerUpdate = isServerUpdate;
 
-                if (App.Clipboard != null)
+                if (_clipboard != null)
                 {
-                    var clipboard = App.Clipboard;
                     switch (data.Type)
                     {
                         case ClipboardType.Text:
-                            var text = System.Text.Encoding.UTF8.GetString(data.Data);
-                            await clipboard.SetTextAsync(text);
-                            _lastHash = GetMd5Hash(text);
-                            data.Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text);
+                            await _clipboard.SetTextAsync(data.Text);
+                            _lastHash = ClipboardUtils.GetMd5Hash(data.Text);
+                            data.Description = "文本: " + (data.Text.Length > 30 ? data.Text[..30] + "..." : data.Text);
                             LogService.Instance.AddLog("已接收", data.Description);
                             break;
 
                         case ClipboardType.File:
                         case ClipboardType.FileList:
-                            if (data.FilenameList.Count > 0)
+                            if (data.CopyFiles.Count > 0)
                             {
-                                data.Description = $"{data.FilenameList.Count} 个文件: {string.Join(", ", data.FilenameList.Select(path => Path.GetFileName(path.TrimEnd('\\'))).Take(5))}";
-                                var dataObject = await CreateDataObject(data);
-                                if (dataObject != null)
-                                {
-                                    await clipboard.SetDataObjectAsync(dataObject);
-                                    _lastHash = GetMd5Hash(string.Join("|", data.FilenameList));
-                                    LogService.Instance.AddLog("已接收", data.Description);
-                                }
-                                else
-                                {
-                                    LogService.Instance.AddLog("错误", "没有可用的文件可以设置到剪贴板");
-                                    return false;
-                                }
+                                data.Description = $"{data.CopyFiles.Count} 个文件: {string.Join(", ", data.CopyFiles.Cast<string>().Select(path => System.IO.Path.GetFileName(path.TrimEnd('\\'))).Take(5))}";
+                                var dataObject = CreateDataObject(data);
+                                await _clipboard.SetDataObjectAsync(dataObject);
+                                _lastHash = ClipboardUtils.GetMd5Hash(string.Join("|", data.CopyFiles));
+                                LogService.Instance.AddLog("已接收", data.Description);
                             }
                             break;
                     }
@@ -134,129 +125,50 @@ namespace ClipFlow.Desktop.Linux.Services
             return true;
         }
 
-        private async Task<IEnumerable<IStorageItem>> GetStorageItems(IEnumerable<string> paths)
-        {
-            var storageItems = new List<IStorageItem>();
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var provider = desktop.MainWindow?.StorageProvider;
-                if (provider != null)
-                {
-                    foreach (var path in paths)
-                    {
-                        try
-                        {
-                            var localPath = new Uri(path).LocalPath;
-                            IStorageItem? item = null;
 
-                            if (Directory.Exists(localPath))
-                            {
-                                item = await provider.TryGetFolderFromPathAsync(localPath);
-                            }
-                            else if (File.Exists(localPath))
-                            {
-                                item = await provider.TryGetFileFromPathAsync(localPath);
-                            }
 
-                            if (item != null)
-                            {
-                                storageItems.Add(item);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogService.Instance.AddLog("警告", $"处理文件路径失败: {path} - {ex.Message}");
-                        }
-                    }
-                }
-            }
-            return storageItems;
-        }
-
-        private async Task<DataObject?> CreateDataObject(ClipboardData data)
+        private DataObject CreateDataObject(ClipboardData data)
         {
             var dataObject = new DataObject();
-            
+
             // 设置纯文本格式
             dataObject.Set("Text", Encoding.UTF8.GetBytes(string.Join('\n', data.FilenameList)));
-            
+
             // 设置URI列表格式
-            var uriEnum = data.FilenameList.Select(file => new Uri(file).GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped));
+            var uriEnum = data.CopyFiles.Cast<string>().Select(file => new Uri(file).GetComponents(UriComponents.SerializationInfoString, UriFormat.UriEscaped));
             var uris = string.Join("\n", uriEnum);
             dataObject.Set("text/uri-list", Encoding.UTF8.GetBytes(uris));
-            
+
             // 设置GNOME格式
             var nautilus = $"x-special/nautilus-clipboard\ncopy\n{uris}\n";
-            dataObject.Set(FileFormat, Encoding.UTF8.GetBytes(nautilus));
-            
+            dataObject.Set(_fileFormat, Encoding.UTF8.GetBytes(nautilus));
+
             return dataObject;
         }
 
-        private async Task<ClipboardData?> ProcessFiles(IEnumerable<IStorageItem> files)
-        {
-            var fileList = files.ToList();
-            if (!fileList.Any()) return null;
 
-            return fileList.Count == 1 && !Directory.Exists(fileList[0].Path.LocalPath)
-                ? await ProcessSingleFile(fileList[0])
-                : await ProcessMultipleItems(fileList);
-        }
-
-        private async Task<ClipboardData> ProcessSingleFile(IStorageItem file)
-        {
-            return new ClipboardData
-            {
-                Type = ClipboardType.File,
-                Filename = file.Name,
-                FilenameList = new List<string> { file.Path.LocalPath },
-                DataLength = (await file.GetBasicPropertiesAsync()).Size,
-                Description = $"单文件: {file.Name}"
-            };
-        }
-
-        private async Task<ClipboardData> ProcessMultipleItems(List<IStorageItem> items)
-        {
-            var sizes = await Task.WhenAll(items.Select(async file => (await file.GetBasicPropertiesAsync()).Size));
-            ulong totalSize = 0;
-            foreach (var size in sizes)
-            {
-                if (size.HasValue)
-                {
-                    totalSize += size.Value;
-                }
-            }
-            return new ClipboardData
-            {
-                Type = ClipboardType.FileList,
-                FilenameList = items.Select(v => v.Path.LocalPath).ToList(),
-                Filename = $"files_{DateTime.Now:yyyyMMddHHmmss}.zip",
-                DataLength = totalSize,
-                Description = $"{items.Count} 个文件: {string.Join(", ", items.Select(path => Path.GetFileName(path.Path.LocalPath.TrimEnd('\\'))).Take(5))}"
-            };
-        }
-
-        private ClipboardData? ProcessText(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return null;
-
-            return new ClipboardData
-            {
-                Type = ClipboardType.Text,
-                Text = text,
-                Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text)
-            };
-        }
-
-        private string GetMd5Hash(string input)
-        {
-            using var md5Hash = System.Security.Cryptography.MD5.Create();
-            var bytes = md5Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
-            return BitConverter.ToString(bytes).ToLower();
-        }
 
         public void Initialize()
         {
-           
+            if (_clipboard==null)
+            {
+                // 创建一个隐藏的顶级窗口
+                var hiddenWindow = new Window
+                {
+                    Width = 0,
+                    Height = 0,
+                    IsVisible = false
+                };
+                // 获取剪贴板实例
+                if (hiddenWindow.Clipboard!=null)
+                {
+                    _clipboard = hiddenWindow.Clipboard;
+                }
+                else
+                {
+                    LogService.Instance.AddLog("警告", $"剪贴板初始化错误。");
+                }
+            }
         }
 
         public void Cleanup()

@@ -36,7 +36,7 @@ namespace ClipFlow.Desktop.Windows.Services
         private bool _isSettingClipboard;
         private bool _isServerUpdate;
 
-        public  ClipboardData? GetContentAsync()
+        public async Task<ClipboardData?> GetContentAsync()
         {
             if (_isSettingClipboard) return null;
 
@@ -123,10 +123,9 @@ namespace ClipFlow.Desktop.Windows.Services
                 switch (data.Type)
                 {
                     case ClipboardType.Text:
-                        var text = Encoding.UTF8.GetString(data.Data);
-                        Clipboard.SetText(text);
-                        _lastHash = ClipboardUtils.GetMd5Hash(text);
-                        data.Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text);
+                        Clipboard.SetText(data.Text);
+                        _lastHash = ClipboardUtils.GetMd5Hash(data.Text);
+                        data.Description = "文本: " + (data.Text.Length > 30 ? data.Text[..30] + "..." : data.Text);
                         LogService.Instance.AddLog("已接收", data.Description);
                         break;
                     case ClipboardType.File:

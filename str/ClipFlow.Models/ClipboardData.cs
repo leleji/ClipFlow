@@ -25,7 +25,6 @@ namespace ClipFlow.Models
 
         public List<string> FilenameList { get; set; }
 
-        public byte[] Data { get; set; }
 
         public string FileName { get; set; }
         /// <summary>

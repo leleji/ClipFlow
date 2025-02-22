@@ -91,7 +91,7 @@ namespace ClipFlow.Desktop.Models
         /// <summary>
         /// 上传文件大小限制，单位：Mb（0表示不限制）
         /// </summary>
-        public int MaxUploadFileSize { get; set; } = 20;
+        public ulong MaxUploadFileSize { get; set; } = 20;
 
         /// <summary>
         /// 下载文件大小限制，单位：Mb（0表示不限制）

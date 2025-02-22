@@ -1,12 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Interfaces;
+using ClipFlow.Desktop.Interfaces;
 
 namespace ClipFlow.Desktop.Linux.Services
 {
-    public class LinuxNotificationService : INotification
+    public class LinuxNotificationService : INotificationService
     {
         private bool _isInitialized;
         private const string APP_NAME = "ClipFlow";
@@ -34,7 +35,7 @@ namespace ClipFlow.Desktop.Linux.Services
 
                     if (!_isInitialized)
                     {
-                        FileLogService._.Error("未找到notify-send命令，请安装libnotify-bin包");
+                        FileLogService.Instance.Error("未找到notify-send命令，请安装libnotify-bin包");
                     }
                     else
                     {
@@ -56,11 +57,11 @@ namespace ClipFlow.Desktop.Linux.Services
                             if (!string.IsNullOrEmpty(error))
                             {
                                 _isInitialized = false;
-                                FileLogService._.Error($"通知服务测试失败: {error}");
+                                FileLogService.Instance.Error($"通知服务测试失败: {error}");
                             }
                             else
                             {
-                                FileLogService._.Info("Linux通知服务初始化成功");
+                                FileLogService.Instance.Info("Linux通知服务初始化成功");
                             }
                         }
                     }
@@ -68,7 +69,7 @@ namespace ClipFlow.Desktop.Linux.Services
             }
             catch (Exception ex)
             {
-                FileLogService._.Error("初始化 Linux 通知失败", ex);
+                FileLogService.Instance.Error("初始化 Linux 通知失败", ex);
             }
         }
 
@@ -76,7 +77,7 @@ namespace ClipFlow.Desktop.Linux.Services
         {
             if (!_isInitialized || string.IsNullOrEmpty(_notifySendPath))
             {
-                FileLogService._.Error("通知服务未初始化");
+                FileLogService.Instance.Error("通知服务未初始化");
                 return;
             }
 
@@ -101,13 +102,13 @@ namespace ClipFlow.Desktop.Linux.Services
 
                     if (!string.IsNullOrEmpty(error))
                     {
-                        FileLogService._.Error($"显示Linux通知失败: {error}");
+                        FileLogService.Instance.Error($"显示Linux通知失败: {error}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                FileLogService._.Error("显示 Linux 通知失败", ex);
+                FileLogService.Instance.Error("显示 Linux 通知失败", ex);
             }
         }
 

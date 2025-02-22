@@ -62,7 +62,7 @@ namespace ClipFlow.Desktop.Windows.Services
             // 处理消息
             if (m.Msg == WM_CLIPBOARDUPDATE)
             {
-                var clipData = _clipboardHandler.GetContentAsync();
+                var clipData =_clipboardHandler.GetContentAsync().Result;
                 if (clipData != null)
                 {
                     OnClipboardChanged?.Invoke(clipData);

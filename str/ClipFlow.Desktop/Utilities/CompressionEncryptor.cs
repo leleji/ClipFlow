@@ -22,15 +22,14 @@ namespace ClipFlow.Desktop.Utilities
         private static readonly Aes AesInstance = Aes.Create();
         
 
-
-
         // 对字符串进行加密，并保存为临时文件
         public static byte[] EncryptTextToTemporaryFile(ClipboardData data, string password)
         {
             using var stream = new MemoryStream();
+            var textdata= Encoding.UTF8.GetBytes(data.Text);
             stream.Write(BitConverter.GetBytes((int)data.Type));
-            stream.Write(BitConverter.GetBytes(data.Data.Length));
-            stream.Write(data.Data);
+            stream.Write(BitConverter.GetBytes(textdata.Length));
+            stream.Write(textdata);
             if (string.IsNullOrEmpty(password))
             {
                 return stream.ToArray();
@@ -84,7 +83,7 @@ namespace ClipFlow.Desktop.Utilities
             try
             {
                 using FileStream fileStream = new FileStream(tempPathFile, FileMode.Open, FileAccess.ReadWrite);
-                using var decryptedStream = DecryptWithEcb(fileStream, password);
+                using var decryptedStream = string.IsNullOrEmpty(password)? fileStream: DecryptWithEcb(fileStream, password);
                 using var reader = new BinaryReader(decryptedStream, Encoding.UTF8, leaveOpen: true);
                 // 读取类型
                 var type = (ClipboardType)reader.ReadInt32();

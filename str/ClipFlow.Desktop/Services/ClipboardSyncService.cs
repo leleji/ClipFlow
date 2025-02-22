@@ -278,9 +278,9 @@ namespace ClipFlow.Desktop.Services
                         LogService.Instance.AddLog("提示", "文本上传已禁用");
                         return false;
                     }
-                    if (config.MaxTextLength > 0 && data.Data.Length > config.MaxTextLength)
+                    if (config.MaxTextLength > 0 && data.Text.Length > config.MaxTextLength)
                     {
-                        LogService.Instance.AddLog("提示", $"文本长度超过限制: {data.Data.Length}/{config.MaxTextLength}");
+                        LogService.Instance.AddLog("提示", $"文本长度超过限制: {data.Text.Length}/{config.MaxTextLength}");
                         return false;
                     }
                     break;
@@ -322,9 +322,9 @@ namespace ClipFlow.Desktop.Services
                         return false;
                     }
 
-                    if (config.MaxUploadFileSize > 0 && data.Data.Length > config.MaxUploadFileSize * 1024 * 1024)
+                    if (config.MaxUploadFileSize > 0 && data.DataLength> config.MaxUploadFileSize * 1024 * 1024)
                     {
-                        LogService.Instance.AddLog("提示", $"文件大小超过限制: {data.Data.Length / 1024 / 1024}MB/{config.MaxUploadFileSize}MB");
+                        LogService.Instance.AddLog("提示", $"文件大小超过限制: {data.DataLength / 1024 / 1024}MB/{config.MaxUploadFileSize}MB");
                         return false;
                     }
                     break;
@@ -335,9 +335,9 @@ namespace ClipFlow.Desktop.Services
                         LogService.Instance.AddLog("提示", "多文件上传已禁用");
                         return false;
                     }
-                    if (config.MaxUploadFileSize > 0 && data.Data.Length > config.MaxUploadFileSize * 1024 * 1024)
+                    if (config.MaxUploadFileSize > 0 && data.DataLength > config.MaxUploadFileSize * 1024 * 1024)
                     {
-                        LogService.Instance.AddLog("提示", $"压缩包大小超过限制: {data.Data.Length / 1024 / 1024}MB/{config.MaxUploadFileSize}MB");
+                        LogService.Instance.AddLog("提示", $"压缩包大小超过限制: {data.DataLength / 1024 / 1024}MB/{config.MaxUploadFileSize}MB");
                         return false;
                     }
                     break;

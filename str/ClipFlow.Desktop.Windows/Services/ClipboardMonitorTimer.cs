@@ -63,10 +63,10 @@ namespace ClipFlow.Desktop.Windows.Services
             _clipboardHandler.Cleanup();
         }
 
-        private void CheckClipboardContent()
+        private async Task CheckClipboardContent()
         {
             if (!_isMonitoring) return;
-            var clipData = _clipboardHandler.GetContentAsync();
+            var clipData =await _clipboardHandler.GetContentAsync();
             if (clipData != null)
             {
                 OnClipboardChanged?.Invoke(clipData);

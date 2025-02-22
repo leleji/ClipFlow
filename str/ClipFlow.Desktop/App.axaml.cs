@@ -30,13 +30,13 @@ namespace ClipFlow.Desktop
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
-                // ³õÊ¼»¯ÍĞÅÌÍ¼±ê
+                // åˆå§‹åŒ–æ‰˜ç›˜å›¾æ ‡
                 InitializeTrayIcon(desktop);
             }
-            // »ñÈ¡·şÎñ
+            // è·å–æœåŠ¡
             var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
             var clipboardSyncService = AppServices.ServiceProvider.GetRequiredService<IClipboardSyncService>();
-            // Èç¹ûĞèÒªÆô¶¯·şÎñ
+            // å¦‚æœéœ€è¦å¯åŠ¨æœåŠ¡
             if (configService.CurrentConfig.IsEnabled)
             {
                 clipboardSyncService.Start();
@@ -63,7 +63,7 @@ namespace ClipFlow.Desktop
                 {
                     DataContext = AppServices.ServiceProvider.GetRequiredService<MainWindowViewModel>()
                 };
-                // ¶©ÔÄ´°¿ÚÊÂ¼ş
+                // è®¢é˜…çª—å£äº‹ä»¶
                 desktop.MainWindow.Closing += MainWindow_Closing;
                 //mainWindow.Opened += MainWindow_Opened;
 
@@ -80,7 +80,7 @@ namespace ClipFlow.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow.Closing -= MainWindow_Closing;
-                desktop.MainWindow = null; // ÊÍ·Å´°¿Ú
+                desktop.MainWindow = null; // é‡Šæ”¾çª—å£
                 var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
                 if (!configService.CurrentConfig.MinimizeToTray)
                 {
@@ -92,7 +92,7 @@ namespace ClipFlow.Desktop
 
         private void InitializeTrayIcon(IClassicDesktopStyleApplicationLifetime mainWindow)
         {
-            // Ê¹ÓÃ×ÊÔ´Â·¾¶¼ÓÔØÍ¼±ê
+            // ä½¿ç”¨èµ„æºè·¯å¾„åŠ è½½å›¾æ ‡
             var uri = new Uri("avares://ClipFlow.Desktop/Assets/trayiicon.ico");
             var trayIcon = new TrayIcon
             {
@@ -101,10 +101,10 @@ namespace ClipFlow.Desktop
                 IsVisible = true
             };
        
-            var showMenuItem = new NativeMenuItem("ÏÔÊ¾");
+            var showMenuItem = new NativeMenuItem("æ˜¾ç¤º");
             showMenuItem.Click += (s, e) => Show();
 
-            var exitMenuItem = new NativeMenuItem("ÍË³ö");
+            var exitMenuItem = new NativeMenuItem("é€€å‡º");
             exitMenuItem.Click += (s, e) =>
             {
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

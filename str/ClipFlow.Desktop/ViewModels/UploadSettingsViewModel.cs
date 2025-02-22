@@ -26,7 +26,7 @@ namespace ClipFlow.Desktop.ViewModels
         private int maxTextLength;
 
         [ObservableProperty]
-        private int maxUploadFileSize;
+        private ulong maxUploadFileSize;
 
         [ObservableProperty]
         private bool enableUploadNotification;
@@ -101,7 +101,7 @@ namespace ClipFlow.Desktop.ViewModels
             _configService.SaveConfig();
         }
 
-        partial void OnMaxUploadFileSizeChanged(int value)
+        partial void OnMaxUploadFileSizeChanged(ulong value)
         {
             _configService.CurrentConfig.MaxUploadFileSize = value;
             _configService.SaveConfig();
