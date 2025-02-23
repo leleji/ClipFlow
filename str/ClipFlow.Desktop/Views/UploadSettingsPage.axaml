@@ -118,6 +118,7 @@
 				<controls:SettingItem Title="文件后缀过滤"
 							 BorderThickness="1,1,1,0"
 							 CornerRadius="4,4,0,0"
+									 
 							 Description="设置允许或禁止的文件后缀">
 					<controls:SettingItem.ActionContent>
 						<ComboBox SelectedIndex="{Binding IsFileExtensionWhitelist}"
@@ -136,7 +137,7 @@
 						CornerRadius="0,0,4,4"
 						BorderThickness="1"/>
 			</StackPanel>
-			<StackPanel>
+			<StackPanel IsVisible="{Binding IsProcessNameFilterVisible}">
 				<controls:SettingItem Title="进程名过滤(实验性)"
 									 BorderThickness="1,1,1,0"
 									 CornerRadius="4,4,0,0"
@@ -157,8 +158,8 @@
 						BorderBrush="#20000000"
 						CornerRadius="0,0,4,4"
 						BorderThickness="1"/>
-				<Grid Margin="10"></Grid>
 			</StackPanel>
+			<Grid Margin="10"></Grid>
         </StackPanel>
     </ScrollViewer>
 </UserControl> 

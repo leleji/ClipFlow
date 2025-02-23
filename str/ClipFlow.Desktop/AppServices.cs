@@ -17,10 +17,18 @@ namespace ClipFlow.Desktop
 #pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 "required" 修饰符或声明为可为 null。
         public static void ConfigureServices(IServiceCollection services)
         {
+            var configService = new ConfigService();
+            if (configService.CurrentConfig.ClipboardMonitorMode == 1)
+            {
+                services.AddSingleton<IClipboardMonitor, ClipboardMonitorTimer>();
+            }
+
+
             // 注册所有服务
             services.AddSingleton<ConfigService>();
             services.AddSingleton<IAutoStartService, AutoStartService>();
             services.AddSingleton<IClipboardSyncService, ClipboardSyncService>();
+
 
             // 注册所有ViewModels
             services.AddTransient<MainWindowViewModel>();

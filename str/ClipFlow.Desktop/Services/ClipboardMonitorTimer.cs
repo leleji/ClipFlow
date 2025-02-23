@@ -1,27 +1,11 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Shapes;
-using Avalonia.Input;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ClipFlow.Models;
-using ClipFlow.Desktop.Services;
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using Path = System.IO.Path;
 using System.Timers;
 using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.Windows.Services
+namespace ClipFlow.Desktop
 {
     public class ClipboardMonitorTimer : IClipboardMonitor
     {
@@ -45,9 +29,9 @@ namespace ClipFlow.Desktop.Windows.Services
             _timer.Elapsed += (s, e) =>
             {
                 // 在 UI 线程上执行检查
-                Dispatcher.UIThread.Post(() =>
+                Dispatcher.UIThread.Post(async () =>
                 {
-                    CheckClipboardContent();
+                    await CheckClipboardContent();
                 });
             };
             _timer.Start();

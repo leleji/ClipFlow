@@ -9,9 +9,9 @@ namespace ClipFlow.Api.Services
         private readonly ConcurrentDictionary<string, Queue<ClipboardData>> _clipboardHistory = new();
         private const int MaxHistorySize = 3;
 
-        public void AddRecord(string userKey, ClipboardData record)
+        public void AddRecord(string token, ClipboardData record)
         {
-            var queue = _clipboardHistory.GetOrAdd(userKey, _ => new Queue<ClipboardData>());
+            var queue = _clipboardHistory.GetOrAdd(token, _ => new Queue<ClipboardData>());
 
             // 如果队列已满
             if (queue.Count >= MaxHistorySize)
@@ -57,26 +57,26 @@ namespace ClipFlow.Api.Services
             queue.Enqueue(record);
         }
 
-        public Queue<ClipboardData> GetHistory(string userKey)
+        public Queue<ClipboardData> GetHistory(string token)
         {
-            return _clipboardHistory.GetOrAdd(userKey, _ => new Queue<ClipboardData>());
+            return _clipboardHistory.GetOrAdd(token, _ => new Queue<ClipboardData>());
         }
 
-        public ClipboardData? GetLatest(string userKey)
+        public ClipboardData? GetLatest(string token)
         {
-            var queue = GetHistory(userKey);
+            var queue = GetHistory(token);
             return queue.LastOrDefault();
         }
 
-        public ClipboardData? GetLatestText(string userKey)
+        public ClipboardData? GetLatestText(string token)
         {
-            var queue = GetHistory(userKey);
+            var queue = GetHistory(token);
             return queue.LastOrDefault(x => x.Type == ClipboardType.Text);
         }
 
-        public ClipboardData? GetByUuid(string userKey, string uuid)
+        public ClipboardData? GetByUuid(string token, string uuid)
         {
-            var queue = GetHistory(userKey);
+            var queue = GetHistory(token);
             return queue.FirstOrDefault(x => x.Uuid == uuid);
         }
 

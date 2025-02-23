@@ -20,7 +20,17 @@
                                  Margin="0,-6,0,-6"/>
 				</controls:SettingItem.ActionContent>
 			</controls:SettingItem>
-
+			<controls:SettingItem Title="剪贴板监控模式(重启生效)"
+                                 Description="推荐模式高效模式，如果无法使用就采用兼容模式，兼容模式会有延迟">
+				<controls:SettingItem.ActionContent>
+					<ComboBox SelectedIndex="{Binding ClipboardMonitorMode}"
+                              MinWidth="120"
+                              VerticalAlignment="Center">
+						<ComboBoxItem>高效模式</ComboBoxItem>
+						<ComboBoxItem>兼容模式</ComboBoxItem>
+					</ComboBox>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
 			<controls:SettingItem Title="最小化到托盘"
                                  Description="关闭窗口时最小化到系统托盘">
 				<controls:SettingItem.ActionContent>
@@ -42,6 +52,7 @@
 					</ComboBox>
 				</controls:SettingItem.ActionContent>
 			</controls:SettingItem>
+
 		</StackPanel>
 	</ScrollViewer>
 </UserControl>

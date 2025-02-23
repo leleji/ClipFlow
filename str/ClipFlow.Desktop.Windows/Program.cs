@@ -22,7 +22,17 @@ internal class Program
         ServiceCollection services = new();
         services.AddSingleton<IClipboardHandler, WindowsClipboardService>();
         services.AddSingleton<INotificationService, WindowsNotificationService>();
-        services.AddSingleton<IClipboardMonitor, ClipboardMonitor>();
+
+        // 根据配置选择剪贴板监控实现
+        var configService = new ConfigService();
+        if (configService.CurrentConfig.ClipboardMonitorMode == 1)
+        {
+            services.AddSingleton<IClipboardMonitor, ClipboardMonitorTimer>();
+        }
+        else
+        {
+            services.AddSingleton<IClipboardMonitor, ClipboardMonitor>();
+        }
         
         AppServices.ConfigureServices(services);
         BuildAvaloniaApp()

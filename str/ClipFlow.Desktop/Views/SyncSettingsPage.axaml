@@ -47,16 +47,6 @@
 							   Watermark=""/>
 							</controls:SettingItem.ActionContent>
 						</controls:SettingItem>
-						<controls:SettingItem Title="用户Key"
-											  BackgroundColor="Transparent"
-											  BorderThickness="0,1,0,0"
-                      CornerRadius="0"
-					 Description="不同设备设置为相同的key">
-							<controls:SettingItem.ActionContent>
-								<TextBox
-							   Text="{Binding UserKey}"/>
-							</controls:SettingItem.ActionContent>
-						</controls:SettingItem>
 						<controls:SettingItem Title="同步加密"
 					  BackgroundColor="Transparent"
 					  BorderThickness="0,1,0,0"

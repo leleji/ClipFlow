@@ -21,6 +21,9 @@ namespace ClipFlow.Desktop.ViewModels
         private int _themeMode;
 
         [ObservableProperty]
+        private int _clipboardMonitorMode;
+
+        [ObservableProperty]
         private string _title = "设置";
 
         [ObservableProperty]
@@ -35,6 +38,7 @@ namespace ClipFlow.Desktop.ViewModels
             _autoStart = _autoStartService.IsEnabled;
             _minimizeToTray = _configService.CurrentConfig.MinimizeToTray;
             _themeMode = _configService.CurrentConfig.ThemeMode;
+            _clipboardMonitorMode = _configService.CurrentConfig.ClipboardMonitorMode;
         }
 
         partial void OnAutoStartChanged(bool value)
@@ -70,6 +74,12 @@ namespace ClipFlow.Desktop.ViewModels
                     _ => null
                 };
             }
+        }
+
+        partial void OnClipboardMonitorModeChanged(int value)
+        {
+            _configService.CurrentConfig.ClipboardMonitorMode = value;
+            _configService.SaveConfig();
         }
     }
 } 

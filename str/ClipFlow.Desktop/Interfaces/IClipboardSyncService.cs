@@ -10,7 +10,7 @@ namespace ClipFlow.Desktop.Interfaces
         void Start();
         void Stop();
         void UpdateBaseUrl(string url);
-        void UpdateHeaders(string token, string userKey);
+        void UpdateHeaders(string token);
         WebSocketState GetWebSocketState();
     }
 }

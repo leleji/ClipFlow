@@ -12,6 +12,7 @@
 	<RootNamespace>ClipFlow</RootNamespace>
     <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
 	 <UseWindowsForms>true</UseWindowsForms>
+
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />
@@ -19,5 +20,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Services\ClipboardMonitor1.cs" />
   </ItemGroup>
 </Project>

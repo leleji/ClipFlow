@@ -30,7 +30,7 @@ namespace ClipFlow.Desktop.Win.Services
         private const string libXfixes = "libXfixes.so.3";
 
         [DllImport(libX11)]
-        private static extern IntPtr XOpenDisplay(string display);
+        private static extern IntPtr XOpenDisplay(string? display);
 
         [DllImport(libX11)]
         private static extern int XCloseDisplay(IntPtr display);
@@ -97,7 +97,7 @@ namespace ClipFlow.Desktop.Win.Services
             _display = XOpenDisplay(null);
             if (_display == IntPtr.Zero)
             {
-                Console.WriteLine("无法打开 X 显示器");
+                Console.WriteLine("无法连接x11");
                 return;
             }
 

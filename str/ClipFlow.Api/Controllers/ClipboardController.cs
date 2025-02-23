@@ -22,9 +22,6 @@ namespace ClipFlow.Api.Controllers
         private readonly ILogger<ClipboardController> _logger;
         private readonly string _fileStoragePath;
         private readonly AppSettings _appSettings;
-        private static readonly ConcurrentDictionary<string, WebSocket> _sockets = new();
-        private static readonly ConcurrentDictionary<string, DateTime> _lastPingTime = new();
-
         public ClipboardController(
             ClipboardWebSocketManager webSocketManager,
             ClipboardDataManager clipboardManager,
@@ -43,6 +40,7 @@ namespace ClipFlow.Api.Controllers
             }
         }
 
+
         [HttpPost("{type}")]
         [RequestSizeLimit(524288000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
@@ -50,7 +48,7 @@ namespace ClipFlow.Api.Controllers
         {
             try
             {
-                var userKey = Request.Headers["X-User-Key"].ToString();
+                var token = Request.Headers["X-Auth-Token"].ToString();
                 var contentLength = (ulong)(Request.ContentLength ?? 0);
 
                 // 检查文件大小限制（仅当 MaxFileSize > 0 时）
@@ -86,22 +84,15 @@ namespace ClipFlow.Api.Controllers
                     {
                         await fileStream.WriteAsync(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
-
-                        // 可选：报告进度
-                        //if (contentLength > 0)
-                        //{
-                        //    var progress = (double)totalBytesRead / contentLength * 100;
-                        //    _logger.LogDebug($"Upload progress: {progress:F2}% ({totalBytesRead}/{contentLength} bytes)");
-                        //}
                     }
 
                     await fileStream.FlushAsync();
                 }
                 // 添加到历史记录
-                _clipboardManager.AddRecord(userKey, record);
-                if (_clipboardManager.GetHistory(userKey).Count > 20)
+                _clipboardManager.AddRecord(token, record);
+                if (_clipboardManager.GetHistory(token).Count > 20)
                 {
-                    var oldRecord = _clipboardManager.GetHistory(userKey).Dequeue();
+                    var oldRecord = _clipboardManager.GetHistory(token).Dequeue();
                     if (oldRecord.FileName != null)
                     {
                         var oldFile = Path.Combine(_fileStoragePath, oldRecord.FileName);
@@ -114,16 +105,20 @@ namespace ClipFlow.Api.Controllers
 
                 // 获取当前连接的客户端ID并记录日志
                 var currentClientId = Request.Headers["X-Client-Id"].ToString();
-                _logger.LogInformation($"Upload request from client: {currentClientId}, UserKey: {userKey}");
+                _logger.LogInformation($"Upload request from client: {currentClientId}, Token: {token}");
 
                 // 通知其他客户端
                 var json = JsonSerializer.Serialize(record);
                 var jsonbuffer = Encoding.UTF8.GetBytes(json);
                 
-                _logger.LogInformation($"Broadcasting to other clients. Current client: {currentClientId}, UserKey: {userKey}");
-                await _webSocketManager.BroadcastToUserAsync(userKey, currentClientId, jsonbuffer);
+                _logger.LogInformation($"Broadcasting to other clients. Current client: {currentClientId}, Token: {token}");
+                await _webSocketManager.BroadcastToUserAsync(token, currentClientId, jsonbuffer);
 
                 return Ok(ApiResponse<object>.Success(new { uuid = record.Uuid }, "数据已同步"));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResponse<object>.Error(401, ex.Message));
             }
             catch (Exception ex)
             {
@@ -144,39 +139,49 @@ namespace ClipFlow.Api.Controllers
         [HttpGet("file/{uuid}")]
         public ActionResult<ApiResponse<object>> GetFile(string uuid)
         {
-            var userKey = Request.Headers["X-User-Key"].ToString();
-            var record = _clipboardManager.GetByUuid(userKey, uuid);
-            if (record == null)
+            try 
             {
-                return NotFound(ApiResponse<object>.Error(404, "数据未找到"));
-            }
+                var token = Request.Headers["X-Auth-Token"].ToString();
+                var record = _clipboardManager.GetByUuid(token, uuid);
+                if (record == null)
+                {
+                    return NotFound(ApiResponse<object>.Error(404, "数据未找到"));
+                }
 
-            var physicalFileName = $"{uuid}.dat";
-            var filePath = Path.Combine(_fileStoragePath, physicalFileName);
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound(ApiResponse<object>.Error(404, "文件未找到"));
+                var physicalFileName = $"{uuid}.dat";
+                var filePath = Path.Combine(_fileStoragePath, physicalFileName);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound(ApiResponse<object>.Error(404, "文件未找到"));
+                }
+                return PhysicalFile(filePath, "application/octet-stream", record.FileName);
             }
-            return PhysicalFile(filePath, "application/octet-stream", record.FileName);
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResponse<object>.Error(401, ex.Message));
+            }
         }
 
         [HttpGet]
         public ActionResult<ApiResponse<ClipboardData>> GetLatest([FromQuery] bool onlyText = false)
         {
-            var userKey = Request.Headers["X-User-Key"].ToString();
-            var latest = onlyText 
-                ? _clipboardManager.GetLatestText(userKey)
-                : _clipboardManager.GetLatest(userKey);
-            
-            if (latest == null)
+            try
             {
-                return NotFound(ApiResponse<ClipboardData>.Error(404, "暂无数据"));
+                var token = Request.Headers["X-Auth-Token"].ToString();
+                var latest = onlyText 
+                    ? _clipboardManager.GetLatestText(token)
+                    : _clipboardManager.GetLatest(token);
+                
+                if (latest == null)
+                {
+                    return NotFound(ApiResponse<object>.Error(404, "暂无数据"));
+                }
+                return ApiResponse<ClipboardData>.Success(latest);
             }
-            if (onlyText) {
-                latest.Text = Encoding.UTF8.GetString(latest.Data);
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResponse<object>.Error(401, ex.Message));
             }
-
-            return ApiResponse<ClipboardData>.Success(latest);
         }
 
         [HttpGet("ws")]
@@ -186,14 +191,18 @@ namespace ClipFlow.Api.Controllers
         public async Task Socket()
         {
             var connectionId = Request.Headers["X-Client-Id"].ToString();
-            var userKey = Request.Headers["X-User-Key"].ToString();
-            if (HttpContext.WebSockets.IsWebSocketRequest && !string.IsNullOrEmpty(connectionId) && !string.IsNullOrEmpty(userKey))
+            var token = Request.Headers["X-Auth-Token"].ToString();
+            if (HttpContext.WebSockets.IsWebSocketRequest && !string.IsNullOrEmpty(connectionId) && !string.IsNullOrEmpty(token))
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                var token = Request.Headers["X-Auth-Token"].ToString();
                 try
                 {
-                    _webSocketManager.AddSocket(connectionId, webSocket, token, userKey);
+                    if (!_appSettings.Tokens.Contains(token))
+                    {
+                        throw new UnauthorizedAccessException("无效的访问令牌");
+                    }
+
+                    _webSocketManager.AddSocket(connectionId, webSocket, token);
 
                     var buffer = new byte[1024 * 4];
                     while (webSocket.State == WebSocketState.Open)
@@ -239,6 +248,5 @@ namespace ClipFlow.Api.Controllers
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
         }
-
     }
 } 

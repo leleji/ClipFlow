@@ -23,8 +23,6 @@ namespace ClipFlow.Desktop.ViewModels
         [ObservableProperty]
         private string _token;
 
-        [ObservableProperty]
-        private string _userKey;
 
         [ObservableProperty]
         private string _dataKey;
@@ -42,7 +40,6 @@ namespace ClipFlow.Desktop.ViewModels
             // 加载配置
             _host = _configService.CurrentConfig.Host;
             _token = _configService.CurrentConfig.Token;
-            _userKey = _configService.CurrentConfig.UserKey;
             _dataKey = _configService.CurrentConfig.DataKey;
             // 订阅WebSocket状态变化
             _webSocketStateHandler = state =>
@@ -96,11 +93,6 @@ namespace ClipFlow.Desktop.ViewModels
             _configService.SaveConfig();
         }
 
-        partial void OnUserKeyChanged(string value)
-        {
-            _configService.CurrentConfig.UserKey = value;
-            _configService.SaveConfig();
-        }
         partial void OnDataKeyChanged(string value)
         {
             _configService.CurrentConfig.DataKey = value;

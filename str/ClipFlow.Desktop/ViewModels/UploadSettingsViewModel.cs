@@ -1,11 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using ClipFlow.Desktop.Services;
+using System.Runtime.InteropServices;
 
 namespace ClipFlow.Desktop.ViewModels
 {
     public partial class UploadSettingsViewModel : ViewModelBase
     {
         private readonly ConfigService _configService;
+
+        [ObservableProperty]
+        private bool isProcessNameFilterVisible;
 
         [ObservableProperty]
         private bool enableUpload;
@@ -46,6 +50,8 @@ namespace ClipFlow.Desktop.ViewModels
         public UploadSettingsViewModel(ConfigService configService)
         {
             _configService = configService;
+            // 在Linux系统下隐藏进程名过滤功能
+            isProcessNameFilterVisible = !RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             LoadSettings();
         }
 

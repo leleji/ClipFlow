@@ -48,7 +48,7 @@ namespace ClipFlow.Desktop.Services
         public void Start()
         {
             UpdateBaseUrl(_configService.CurrentConfig.Host);
-            UpdateHeaders(_configService.CurrentConfig.Token, _configService.CurrentConfig.UserKey);
+            UpdateHeaders(_configService.CurrentConfig.Token);
             if (string.IsNullOrEmpty(_baseUrl))
             {
                 LogService.Instance.AddLog("错误", "服务器地址未设置");
@@ -73,7 +73,6 @@ namespace ClipFlow.Desktop.Services
                 _wsUrl,
                 _clientId,
                 _httpClient.DefaultRequestHeaders.GetValues("X-Auth-Token").FirstOrDefault() ?? string.Empty,
-                _httpClient.DefaultRequestHeaders.GetValues("X-User-Key").FirstOrDefault() ?? string.Empty,
                 HandleWebSocketNotificationAsync);
 
             _webSocketService.StateChanged += (sender, state) =>
@@ -183,11 +182,10 @@ namespace ClipFlow.Desktop.Services
             }
         }
 
-        public void UpdateHeaders(string token, string userKey)
+        public void UpdateHeaders(string token)
         {
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("X-Auth-Token", token);
-            _httpClient.DefaultRequestHeaders.Add("X-User-Key", userKey);
             _httpClient.DefaultRequestHeaders.Add("X-Client-Id", _clientId);
 
             // 如果WebSocket已连接，需要重新连接以使用新的凭证

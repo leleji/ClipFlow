@@ -13,7 +13,6 @@ namespace ClipFlow.Desktop.Services
         private readonly string _wsUrl;
         private readonly string _clientId;
         private readonly string _token;
-        private readonly string _userKey;
         private readonly Func<ClipboardData, Task> _notificationHandler;
         private ClientWebSocket? _webSocket;
         private CancellationTokenSource? _cancellationTokenSource;
@@ -28,13 +27,11 @@ namespace ClipFlow.Desktop.Services
             string wsUrl,
             string clientId,
             string token,
-            string userKey,
             Func<ClipboardData, Task> notificationHandler)
         {
             _wsUrl = wsUrl;
             _clientId = clientId;
             _token = token;
-            _userKey = userKey;
             _notificationHandler = notificationHandler;
         }
 
@@ -56,7 +53,6 @@ namespace ClipFlow.Desktop.Services
                     _webSocket = new ClientWebSocket();
 
                     _webSocket.Options.SetRequestHeader("X-Auth-Token", _token);
-                    _webSocket.Options.SetRequestHeader("X-User-Key", _userKey);
                     _webSocket.Options.SetRequestHeader("X-Client-Id", _clientId);
 
                     await _webSocket.ConnectAsync(new Uri(_wsUrl), _cancellationTokenSource.Token);

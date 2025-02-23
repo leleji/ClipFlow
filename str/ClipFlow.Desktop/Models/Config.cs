@@ -12,10 +12,6 @@ namespace ClipFlow.Desktop.Models
         /// </summary>
         public string Token { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 用户唯一标识
-        /// </summary>
-        public string UserKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 数据加密密钥
@@ -127,5 +123,10 @@ namespace ClipFlow.Desktop.Models
         /// 进程名列表，以逗号分隔
         /// </summary>
         public string ProcessNames { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 剪贴板监控模式：0-高效模式，1-兼容模式
+        /// </summary>
+        public int ClipboardMonitorMode { get; set; } = 0;
     }
 } 

@@ -10,7 +10,7 @@ namespace ClipFlow.Api.Services
     {
         private readonly ConcurrentDictionary<string, WebSocket> _sockets = new();
         private readonly ConcurrentDictionary<string, DateTime> _lastPingTime = new();
-        private readonly ConcurrentDictionary<string, string> _userKeyMap = new();
+        private readonly ConcurrentDictionary<string, string> _tokenMap = new();
         private readonly ILogger<ClipboardWebSocketManager> _logger;
         private readonly AppSettings _appSettings;
 
@@ -24,25 +24,25 @@ namespace ClipFlow.Api.Services
 
         public bool ValidateToken(string token)
         {
-            return !string.IsNullOrEmpty(token) && _appSettings.Token==token;
+            return !string.IsNullOrEmpty(token) && _appSettings.Tokens.Contains(token);
         }
 
-        public void AddSocket(string connectionId, WebSocket socket, string token, string userKey)
+        public void AddSocket(string connectionId, WebSocket socket, string token)
         {
             _sockets.TryAdd(connectionId, socket);
-            _userKeyMap.TryAdd(connectionId, userKey);
+            _tokenMap.TryAdd(connectionId, token);
             _lastPingTime[connectionId] = DateTime.UtcNow;
             
             // 启动心跳检查
             _ = CheckHeartbeat(connectionId);
             
-            _logger.LogInformation($"WebSocket connection added. ID: {connectionId}, UserKey: {userKey}");
+            _logger.LogInformation($"WebSocket connection added. ID: {connectionId}, Token: {token}");
         }
 
         public void RemoveSocket(string connectionId)
         {
             _sockets.TryRemove(connectionId, out _);
-            _userKeyMap.TryRemove(connectionId, out _);
+            _tokenMap.TryRemove(connectionId, out _);
             _lastPingTime.TryRemove(connectionId, out _);
             _logger.LogInformation($"WebSocket connection removed. ID: {connectionId}");
         }
@@ -87,11 +87,11 @@ namespace ClipFlow.Api.Services
             }
         }
 
-        public async Task BroadcastToUserAsync(string userKey, string excludeConnectionId, byte[] message)
+        public async Task BroadcastToUserAsync(string token, string excludeConnectionId, byte[] message)
         {
             var tasks = _sockets
-                .Where(kvp => _userKeyMap.TryGetValue(kvp.Key, out var uk) && 
-                             uk == userKey && 
+                .Where(kvp => _tokenMap.TryGetValue(kvp.Key, out var uk) && 
+                             uk == token && 
                              kvp.Key != excludeConnectionId)
                 .Select(kvp => SendAsync(kvp.Value, message));
 
