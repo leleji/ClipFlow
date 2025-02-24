@@ -9,9 +9,6 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Platform;
 using ClipFlow.Desktop.Interfaces;
-using System.Net.WebSockets;
-using System.Runtime.InteropServices.JavaScript;
-using Avalonia.Input.Platform;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 namespace ClipFlow.Desktop
@@ -25,14 +22,11 @@ namespace ClipFlow.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
            
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-                // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
-                DisableAvaloniaDataAnnotationValidation();
-                // 初始化托盘图标
-                InitializeTrayIcon(desktop);
-            }
+            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
+            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
+            DisableAvaloniaDataAnnotationValidation();
+            // 初始化托盘图标
+            InitializeTrayIcon();
             // 获取服务
             var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
             var clipboardSyncService = AppServices.ServiceProvider.GetRequiredService<IClipboardSyncService>();
@@ -96,7 +90,7 @@ namespace ClipFlow.Desktop
             }
         }
 
-        private void InitializeTrayIcon(IClassicDesktopStyleApplicationLifetime mainWindow)
+        private void InitializeTrayIcon()
         {
             // 使用资源路径加载图标
             var uri = new Uri("avares://ClipFlow.Desktop/Assets/trayiicon.ico");

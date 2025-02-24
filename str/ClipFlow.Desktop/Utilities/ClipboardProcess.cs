@@ -55,7 +55,7 @@ namespace ClipFlow.Desktop.Utilities
             };
         }
 
-        public static ClipboardData? ProcessFiles(IEnumerable<string> files, string processName)
+        public static ClipboardData? ProcessFiles(IEnumerable<string> files, string processName="")
         {
             var fileList = files.ToList();
             if (!files.Any()) return null;

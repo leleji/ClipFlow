@@ -138,10 +138,10 @@
 						BorderThickness="1"/>
 			</StackPanel>
 			<StackPanel IsVisible="{Binding IsProcessNameFilterVisible}">
-				<controls:SettingItem Title="进程名过滤(实验性)"
+				<controls:SettingItem Title="程序过滤(实验性)"
 									 BorderThickness="1,1,1,0"
 									 CornerRadius="4,4,0,0"
-									 Description="设置允许或禁止的进程名">
+									 Description="设置允许或禁止的进程名获取程序名,在日志界面同步成功会有程序名">
 					<controls:SettingItem.ActionContent>
 						<ComboBox SelectedIndex="{Binding IsProcessNameWhitelist}"
 								Width="150">

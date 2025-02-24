@@ -1,12 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.Services;
-using ClipFlow.Interfaces;
 using Foundation;
 
 namespace ClipFlow.Desktop.MacOs.Services;
 
-public class MacOSNotificationService : INotification
+
+public class MacOSNotificationService : INotificationService
 {
     private bool _isInitialized;
     private NSUserNotificationCenter? _notificationCenter;
@@ -18,11 +19,11 @@ public class MacOSNotificationService : INotification
         if (_notificationCenter != null)
         {
             _isInitialized = true;
-            FileLogService._.Info("macOS通知服务初始化成功");
+            FileLogService.Instance.Info("macOS通知服务初始化成功");
         }
         else
         {
-            FileLogService._.Error("macOS通知服务初始化失败");
+            FileLogService.Instance.Error("macOS通知服务初始化失败");
         }
     }
 
@@ -30,7 +31,7 @@ public class MacOSNotificationService : INotification
     {
         if (!_isInitialized)
         {
-            FileLogService._.Error("通知服务未初始化");
+            FileLogService.Instance.Error("通知服务未初始化");
             return;
         }
 
@@ -50,8 +51,9 @@ public class MacOSNotificationService : INotification
         }
         catch (Exception ex)
         {
-            FileLogService._.Error("显示 macOS 通知失败", ex);
+            FileLogService.Instance.Error("显示 macOS 通知失败", ex);
         }
+        
     }
 
     public void Dispose()

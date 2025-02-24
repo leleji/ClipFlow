@@ -22,7 +22,7 @@ using Path = System.IO.Path;
 using System.Timers;
 using ClipFlow.Desktop.Interfaces;
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Desktop.Linux.Services
 {
     public class ClipboardMonitor : IClipboardMonitor
     {
