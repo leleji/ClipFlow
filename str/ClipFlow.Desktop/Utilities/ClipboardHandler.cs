@@ -1,5 +1,5 @@
 ﻿using Avalonia.Platform.Storage;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;

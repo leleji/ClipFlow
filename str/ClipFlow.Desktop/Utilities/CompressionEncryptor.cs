@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using SkiaSharp;
 using Avalonia.Markup.Xaml.Templates;
 using HarfBuzzSharp;

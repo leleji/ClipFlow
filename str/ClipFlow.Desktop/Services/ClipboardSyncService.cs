@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.IO.Compression;
 using System.Net.WebSockets;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using ClipFlow.Desktop.Utilities;
 using System.Threading;
 using System;
@@ -389,7 +389,6 @@ namespace ClipFlow.Desktop.Services
                     try
                     {
                         var url = $"{_baseUrl}/{data.Type.ToString().ToLower()}";
-                        FileStream fileStream1=null ;
                         HttpContent content;
                         switch (data.Type)
                         {
@@ -418,6 +417,8 @@ namespace ClipFlow.Desktop.Services
                         {
                             var response = await _httpClient.PostAsync(url, content, _uploadCancellationTokenSource.Token);
                             var resjson = await response.Content.ReadFromJsonAsync<ApiResponse<ClipboardData>>();
+                            if (resjson==null)
+                                break;
                             if (!resjson.IsSuccessStatusCode)
                             {
                                 if (response.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
@@ -436,7 +437,6 @@ namespace ClipFlow.Desktop.Services
                                     $"已上传: {data.Description}"
                                 );
                             }
-                            fileStream1?.Dispose();
                             break;
                         }
                     }

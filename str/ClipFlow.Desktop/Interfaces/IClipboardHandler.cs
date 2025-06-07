@@ -1,4 +1,4 @@
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using System.Threading.Tasks;
 
 namespace ClipFlow.Desktop.Interfaces

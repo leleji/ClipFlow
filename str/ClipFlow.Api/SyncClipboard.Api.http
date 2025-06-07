@@ -1,6 +1,0 @@
-@ClipFlow.Api_HostAddress = http://localhost:5258
-
-GET {{ClipFlow.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-####

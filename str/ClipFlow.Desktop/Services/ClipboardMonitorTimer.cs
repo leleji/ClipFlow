@@ -1,5 +1,5 @@
 using Avalonia.Threading;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using System;
 using System.Threading.Tasks;
 using System.Timers;

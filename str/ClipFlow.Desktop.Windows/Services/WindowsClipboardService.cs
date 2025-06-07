@@ -2,7 +2,7 @@ using ClipFlow.Desktop.Constants;
 using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.Services;
 using ClipFlow.Desktop.Utilities;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 
 
 namespace ClipFlow.Desktop.Windows.Services

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
-using ClipFlow.Models;
+using ClipFlow.Desktop.Models;
 using System.Text.Json;
 using System.Threading;
 using System.Text;

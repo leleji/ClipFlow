@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 
-namespace ClipFlow.Models
+namespace ClipFlow.Desktop.Models
 {
 
     public class ClipboardData
@@ -10,7 +10,7 @@ namespace ClipFlow.Models
         public ClipboardType Type { get; set; }
         public string Uuid { get; set; }
         public string Description { get; set; }
-        public ulong? DataLength { get; set; }
+        public ulong DataLength { get; set; }
         public string FileName { get; set; }
         /// <summary>
         /// 进程名
