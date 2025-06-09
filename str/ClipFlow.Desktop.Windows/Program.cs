@@ -1,13 +1,13 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Media;
-using ClipFlow.Desktop.Services;
+using ClipFlow.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
-using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.Windows.Services;
+using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Windows.Services;
 using NLog;
 
-namespace ClipFlow.Desktop.Windows;
+namespace ClipFlow.Core.Windows;
 
 internal class Program
 {

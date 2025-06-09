@@ -1,8 +1,8 @@
-using ClipFlow.Desktop.Constants;
-using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.Services;
-using ClipFlow.Desktop.Utilities;
-using ClipFlow.Desktop.Models;
+using ClipFlow.Core.Constants;
+using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Services;
+using ClipFlow.Core.Utilities;
+using ClipFlow.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace ClipFlow.Desktop.Windows.Services
+namespace ClipFlow.Core.Windows.Services
 {
     public class WindowsClipboardService : IClipboardHandler
     {

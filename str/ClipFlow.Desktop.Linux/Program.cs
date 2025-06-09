@@ -3,11 +3,11 @@ using System;
 using System.Runtime.InteropServices;
 using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
-using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.Linux.Services;
-using ClipFlow.Desktop.Win.Services;
+using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Linux.Services;
+using ClipFlow.Core.Win.Services;
 
-namespace ClipFlow.Desktop.Linux;
+namespace ClipFlow.Core.Linux;
 
 internal class Program
 {

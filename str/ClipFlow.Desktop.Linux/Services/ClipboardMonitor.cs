@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ClipFlow.Models;
-using ClipFlow.Desktop.Services;
+using ClipFlow.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,9 +20,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 using System.Timers;
-using ClipFlow.Desktop.Interfaces;
+using ClipFlow.Core.Interfaces;
 
-namespace ClipFlow.Desktop.Win.Services
+namespace ClipFlow.Core.Win.Services
 {
     public class ClipboardMonitor : IClipboardMonitor
     {

@@ -1,14 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	 <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
+	 <ApplicationIcon>..\ClipFlow.Core\Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Desktop.csproj" />
+    <ProjectReference Include="..\ClipFlow.Core\ClipFlow.Core.csproj" />
   </ItemGroup>
 </Project> 

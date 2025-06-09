@@ -2,11 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Runtime.Versioning;
-using ClipFlow.Desktop.Services;
+using ClipFlow.Core.Services;
 using Avalonia.Threading;
-using ClipFlow.Desktop.Interfaces;
+using ClipFlow.Core.Interfaces;
 
-namespace ClipFlow.Desktop.Windows.Services
+namespace ClipFlow.Core.Windows.Services
 {
     [SupportedOSPlatform("windows10.0.19041.0")]
     public class WindowsNotificationService : INotificationService

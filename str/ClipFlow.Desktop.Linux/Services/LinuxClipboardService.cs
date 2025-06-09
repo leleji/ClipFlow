@@ -4,10 +4,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
-using ClipFlow.Desktop.Constants;
-using ClipFlow.Desktop.Interfaces;
-using ClipFlow.Desktop.Services;
-using ClipFlow.Desktop.Utilities;
+using ClipFlow.Core.Constants;
+using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Services;
+using ClipFlow.Core.Utilities;
 using ClipFlow.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClipFlow.Desktop.Linux.Services
+namespace ClipFlow.Core.Linux.Services
 {
     public class LinuxClipboardService : IClipboardHandler
     {

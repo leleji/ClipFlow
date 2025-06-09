@@ -2,10 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
-using ClipFlow.Desktop.Services;
-using ClipFlow.Desktop.Interfaces;
+using ClipFlow.Core.Services;
+using ClipFlow.Core.Interfaces;
 
-namespace ClipFlow.Desktop.Linux.Services
+namespace ClipFlow.Core.Linux.Services
 {
     public class LinuxNotificationService : INotificationService
     {

@@ -1,12 +1,12 @@
-using ClipFlow.Models;
-using ClipFlow.Desktop.Services;
+using ClipFlow.Core.Models;
+using ClipFlow.Core.Services;
 using System;
 using System.Threading.Tasks;
-using ClipFlow.Desktop.Interfaces;
+using ClipFlow.Core.Interfaces;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace ClipFlow.Desktop.Windows.Services
+namespace ClipFlow.Core.Windows.Services
 {
     public class ClipboardMonitor : Form, IClipboardMonitor
     {
