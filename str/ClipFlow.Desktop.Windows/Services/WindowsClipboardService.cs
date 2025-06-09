@@ -1,8 +1,8 @@
 using ClipFlow.Core.Constants;
 using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Models;
 using ClipFlow.Core.Services;
 using ClipFlow.Core.Utilities;
-using ClipFlow.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,9 +14,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 
-namespace ClipFlow.Core.Windows.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     public class WindowsClipboardService : IClipboardHandler
     {
@@ -55,7 +56,8 @@ namespace ClipFlow.Core.Windows.Services
                     }
                     return ClipboardProcess.ProcessMultipleItems(list, GetProcessName());
 
-                }else if (Clipboard.ContainsText())
+                }
+                else if (Clipboard.ContainsText())
                 {
                     var text = Clipboard.GetText();
                     if (string.IsNullOrEmpty(text)) return null;
@@ -66,7 +68,8 @@ namespace ClipFlow.Core.Windows.Services
                 }
                 else if (Clipboard.ContainsImage())
                 {
-                    if (Clipboard.ContainsData(ClipboardFormat.Html)) {
+                    if (Clipboard.ContainsData(ClipboardFormat.Html))
+                    {
                         var format = Clipboard.GetData(ClipboardFormat.Html)?.ToString();
                         var textHash = ClipboardUtils.GetMd5Hash(format);
                         if (textHash == _lastHash) return null;
@@ -108,7 +111,7 @@ namespace ClipFlow.Core.Windows.Services
             }
             catch (Exception ex)
             {
-                FileLogService.Instance.Error("获取进程信息异常",ex);
+                FileLogService.Instance.Error("获取进程信息异常", ex);
                 return string.Empty;
             }
         }
@@ -154,18 +157,18 @@ namespace ClipFlow.Core.Windows.Services
             return true;
         }
 
-  
+
 
 
 
         public void Initialize()
         {
-            
+
         }
 
         public void Cleanup()
         {
-            
+
         }
     }
-} 
+}

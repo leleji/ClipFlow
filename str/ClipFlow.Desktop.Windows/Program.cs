@@ -1,13 +1,14 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Media;
-using ClipFlow.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
+using ClipFlow.Core;
 using ClipFlow.Core.Interfaces;
-using ClipFlow.Core.Windows.Services;
+using ClipFlow.Core.Services;
+using ClipFlow.Desktop.Windows.Services;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using System;
 
-namespace ClipFlow.Core.Windows;
+namespace ClipFlow.Desktop.Windows;
 
 internal class Program
 {
@@ -33,7 +34,7 @@ internal class Program
         {
             services.AddSingleton<IClipboardMonitor, ClipboardMonitor>();
         }
-        
+
         AppServices.ConfigureServices(services);
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);

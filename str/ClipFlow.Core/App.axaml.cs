@@ -65,7 +65,10 @@ namespace ClipFlow.Core
             _isShowingWindow = true;
             if (_mainWindow == null)
             {
-                _mainWindow = new MainWindow();
+                _mainWindow = new MainWindow
+                {
+                    DataContext = AppServices.ServiceProvider.GetRequiredService<MainWindowViewModel>()
+                };
 
                 // 关闭窗口时销毁引用，释放内存
                 _mainWindow.Closed += MainWindow_Closed;

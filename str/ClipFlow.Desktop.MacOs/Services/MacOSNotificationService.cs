@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using ClipFlow.Desktop.Services;
-using ClipFlow.Interfaces;
+using ClipFlow.Core.Services;
+using ClipFlow.Core.Interfaces;
 using Foundation;
 
 namespace ClipFlow.Desktop.MacOs.Services;

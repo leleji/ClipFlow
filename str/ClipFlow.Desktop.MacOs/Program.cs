@@ -6,7 +6,7 @@ using Avalonia.Media;
 using ClipFlow.Desktop.Interfaces;
 using ClipFlow.Desktop.MacOs.Services;
 using ClipFlow.Desktop.MacOS.Services;
-using ClipFlow.Desktop.Services;
+using ClipFlow.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Foundation;
 

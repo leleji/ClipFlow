@@ -5,7 +5,7 @@ using Avalonia.Controls.Notifications;
 using ClipFlow.Core.Services;
 using ClipFlow.Core.Interfaces;
 
-namespace ClipFlow.Core.Linux.Services
+namespace ClipFlow.Desktop.Linux.Services
 {
     public class LinuxNotificationService : INotificationService
     {

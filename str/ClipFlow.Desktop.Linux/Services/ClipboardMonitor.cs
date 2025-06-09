@@ -1,28 +1,12 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Shapes;
-using Avalonia.Input;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using ClipFlow.Models;
 using ClipFlow.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net.WebSockets;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using Path = System.IO.Path;
-using System.Timers;
 using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Models;
 
-namespace ClipFlow.Core.Win.Services
+namespace ClipFlow.Desktop.Linux.Services
 {
     public class ClipboardMonitor : IClipboardMonitor
     {

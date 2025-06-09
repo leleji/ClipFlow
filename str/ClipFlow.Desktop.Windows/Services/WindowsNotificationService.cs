@@ -1,19 +1,19 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Runtime.Versioning;
-using ClipFlow.Core.Services;
 using Avalonia.Threading;
 using ClipFlow.Core.Interfaces;
+using ClipFlow.Core.Services;
+using Microsoft.Toolkit.Uwp.Notifications;
+using System;
+using System.Runtime.Versioning;
+using System.Threading.Tasks;
 
-namespace ClipFlow.Core.Windows.Services
+namespace ClipFlow.Desktop.Windows.Services
 {
     [SupportedOSPlatform("windows10.0.19041.0")]
     public class WindowsNotificationService : INotificationService
     {
         private bool _isInitialized;
         private const string APP_NAME = "ClipFlow";
-        
+
 
         public void Initialize()
         {

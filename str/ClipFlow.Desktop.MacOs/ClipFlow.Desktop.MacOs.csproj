@@ -20,6 +20,6 @@
         </BundleResource>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\ClipFlow.Desktop\ClipFlow.Core.csproj" />
+      <ProjectReference Include="..\ClipFlow.Core\ClipFlow.Core.csproj" />
     </ItemGroup>
 </Project>

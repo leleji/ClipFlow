@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using ClipFlow.Core.Interfaces;
-using ClipFlow.Core.Linux.Services;
-using ClipFlow.Core.Win.Services;
+using ClipFlow.Desktop.Linux.Services;
+using ClipFlow.Core;
 
-namespace ClipFlow.Core.Linux;
+namespace ClipFlow.Desktop.Linux;
 
 internal class Program
 {
