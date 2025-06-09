@@ -15,10 +15,16 @@ namespace ClipFlow.Core.Constants
         public const string Html = "HTML Format";
         public const string TextHtml = "text/html";
         public const string ImagePng = "image/png";
-        public const string ImageJpegt = "image/jpeg";
+        public const string ImageJpeg = "image/jpeg";
         public const string ImageBmp = "image/bmp";
 
 
         public const string WindowsFile = "FileDrop";
+        
+        public const string MacFile = "public.file-url";
+        public const string MacText = "public.utf8-plain-text";
+        public const string MacImagePng = "public.png";
+        public const string MacImageJpeg = "public.jpeg";
+        public const string MacImageTiff = "public.tiff";
     }
 }

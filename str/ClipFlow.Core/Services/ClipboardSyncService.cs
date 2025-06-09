@@ -428,7 +428,9 @@ namespace ClipFlow.Core.Services
                                 }
                                 throw new HttpRequestException($"{resjson.Code} - {resjson.Message}");
                             }
-                            LogService.Instance.AddLog("上传",$"{resjson.Message} {data.ProcessName}" );
+
+                            var processName = string.IsNullOrEmpty(data.ProcessName) ? string.Empty : $"[{data.ProcessName}]";
+                            LogService.Instance.AddLog("上传",$"{processName}{resjson.Message}" );
 
                             if (_configService.CurrentConfig.EnableUploadNotification)
                             {
