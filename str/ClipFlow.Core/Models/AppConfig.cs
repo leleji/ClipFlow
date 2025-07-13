@@ -1,6 +1,6 @@
 namespace ClipFlow.Core.Models
 {
-    public class Config
+    public class AppConfig
     {
         /// <summary>
         /// 服务器地址
@@ -17,6 +17,11 @@ namespace ClipFlow.Core.Models
         /// 数据加密密钥
         /// </summary>
         public string DataKey { get; set; } = string.Empty;
+
+        /// <summary>
+        /// userKey 用于标识用户的唯一键
+        /// </summary>
+        public string UserKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 是否启用同步功能

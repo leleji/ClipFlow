@@ -26,6 +26,7 @@ namespace ClipFlow.Core.ViewModels
         {
             _configService = configService;
             LoadSettings();
+            PropertyChanged += _configService.SettingsViewModel_PropertyChanged;
         }
 
         private void LoadSettings()
@@ -37,35 +38,6 @@ namespace ClipFlow.Core.ViewModels
             EnableDownloadNotification = _configService.CurrentConfig.EnableDownloadNotification;
         }
 
-        partial void OnEnableDownloadChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableDownload = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableDownloadTextChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableDownloadText = value;
-            _configService.SaveConfig();
-        }
-
-
-        partial void OnEnableDownloadFileChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableDownloadFile = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnMaxDownloadFileSizeChanged(uint value)
-        {
-            _configService.CurrentConfig.MaxDownloadFileSize = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableDownloadNotificationChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableDownloadNotification = value;
-            _configService.SaveConfig();
-        }
+    
     }
 } 

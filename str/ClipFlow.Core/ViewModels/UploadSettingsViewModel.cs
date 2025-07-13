@@ -1,5 +1,7 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using ClipFlow.Core.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ClipFlow.Core.ViewModels
@@ -53,8 +55,9 @@ namespace ClipFlow.Core.ViewModels
             // 在Linux系统下隐藏进程名过滤功能
             isProcessNameFilterVisible = !RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             LoadSettings();
-        }
 
+            PropertyChanged += _configService.SettingsViewModel_PropertyChanged;
+        }
         private void LoadSettings()
         {
             EnableUpload = _configService.CurrentConfig.EnableUpload;
@@ -71,76 +74,6 @@ namespace ClipFlow.Core.ViewModels
             ProcessNames = _configService.CurrentConfig.ProcessNames;
         }
 
-        partial void OnEnableUploadChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUpload = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableUploadTextChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUploadText = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableUploadImageChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUploadImage = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableUploadFileChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUploadFile = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableUploadMultipleChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUploadMultiple = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnMaxTextLengthChanged(int value)
-        {
-            _configService.CurrentConfig.MaxTextLength = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnMaxUploadFileSizeChanged(ulong value)
-        {
-            _configService.CurrentConfig.MaxUploadFileSize = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnEnableUploadNotificationChanged(bool value)
-        {
-            _configService.CurrentConfig.EnableUploadNotification = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnIsFileExtensionWhitelistChanged(bool value)
-        {
-            _configService.CurrentConfig.IsFileExtensionWhitelist = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnFileExtensionsChanged(string value)
-        {
-            _configService.CurrentConfig.FileExtensions = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnIsProcessNameWhitelistChanged(bool value)
-        {
-            _configService.CurrentConfig.IsProcessNameWhitelist = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnProcessNamesChanged(string value)
-        {
-            _configService.CurrentConfig.ProcessNames = value;
-            _configService.SaveConfig();
-        }
+     
     }
 } 

@@ -23,12 +23,14 @@ namespace ClipFlow.Core.ViewModels
         [ObservableProperty]
         private string _token;
 
+        [ObservableProperty]
+        private string _userKet;
 
         [ObservableProperty]
         private string _dataKey;
 
         [ObservableProperty]
-        private string _serverStatus;
+        private string? _serverStatus;
 
         public SyncSettingsViewModel(
             ConfigService configService,
@@ -41,6 +43,7 @@ namespace ClipFlow.Core.ViewModels
             _host = _configService.CurrentConfig.Host;
             _token = _configService.CurrentConfig.Token;
             _dataKey = _configService.CurrentConfig.DataKey;
+            _userKet= _configService.CurrentConfig.UserKey;
             // 订阅WebSocket状态变化
             _webSocketStateHandler = state =>
             {
@@ -90,6 +93,12 @@ namespace ClipFlow.Core.ViewModels
         partial void OnTokenChanged(string value)
         {
             _configService.CurrentConfig.Token = value;
+            _configService.SaveConfig();
+        }
+
+        partial void OnUserKetChanged(string value)
+        {
+            _configService.CurrentConfig.UserKey = value;
             _configService.SaveConfig();
         }
 

@@ -6,11 +6,6 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using ClipFlow.Core.Models;
-using SkiaSharp;
-using Avalonia.Markup.Xaml.Templates;
-using HarfBuzzSharp;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Diagnostics;
 
 
 namespace ClipFlow.Core.Utilities
@@ -28,14 +23,13 @@ namespace ClipFlow.Core.Utilities
             using var stream = new MemoryStream();
             var textdata= Encoding.UTF8.GetBytes(data.Text);
             stream.Write(BitConverter.GetBytes((int)data.Type));
-            stream.Write(BitConverter.GetBytes(textdata.Length));
+            stream.Write(BitConverter.GetBytes((long)textdata.Length));
             stream.Write(textdata);
             if (string.IsNullOrEmpty(password))
             {
                 return stream.ToArray();
             }
             else {
-               var test= Convert.ToBase64String(EncryptWithEcb(stream.ToArray(), password));
                 return EncryptWithEcb(stream.ToArray(), password);
             }
         }
@@ -72,10 +66,6 @@ namespace ClipFlow.Core.Utilities
             {
                 EncryptFileStream(fs, password, $"{tempPath}.dat");
             }
-
-
-            
-          
         }
 
         // 从临时文件解密为文本
@@ -148,7 +138,7 @@ namespace ClipFlow.Core.Utilities
         private static byte[] EncryptWithEcb(byte[] data, string password)
         {
             AesInstance.Mode = CipherMode.ECB;  // 使用 ECB 模式
-            AesInstance.Key = DeriveKey(password, AesInstance.KeySize / 8);
+            AesInstance.Key = DeriveKey(password);
             AesInstance.Padding = PaddingMode.PKCS7;  // 填充模式
             using var encryptor = AesInstance.CreateEncryptor();
             return encryptor.TransformFinalBlock(data, 0, data.Length);
@@ -159,7 +149,7 @@ namespace ClipFlow.Core.Utilities
         {
             // 设置加密模式和填充方式
             AesInstance.Mode = CipherMode.ECB;  // 使用 ECB 模式
-            AesInstance.Key = DeriveKey(password, AesInstance.KeySize / 8);
+            AesInstance.Key = DeriveKey(password);
             AesInstance.Padding = PaddingMode.PKCS7;  // 填充模式
             // 创建一个 FileStream 来保存加密后的字节数据
             using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
@@ -182,7 +172,7 @@ namespace ClipFlow.Core.Utilities
         {
             Aes aes = Aes.Create();
             aes.Mode = CipherMode.ECB;
-            aes.Key = DeriveKey(password, aes.KeySize / 8);
+            aes.Key = DeriveKey(password);
             aes.Padding = PaddingMode.PKCS7;
 
             ICryptoTransform decryptor = aes.CreateDecryptor();
@@ -191,9 +181,10 @@ namespace ClipFlow.Core.Utilities
 
 
         // 根据密码派生密钥
-        private static byte[] DeriveKey(string password, int keySize)
+        private static byte[] DeriveKey(string password)
         {
-            using var deriveBytes = new Rfc2898DeriveBytes(password, "salt"u8.ToArray(), 100000, HashAlgorithmName.SHA256);
+            var keySize=AesInstance.KeySize / 8;
+            using var deriveBytes = new Rfc2898DeriveBytes(password, "salt"u8.ToArray(), 1000, HashAlgorithmName.SHA256);
             return deriveBytes.GetBytes(keySize);
         }
 

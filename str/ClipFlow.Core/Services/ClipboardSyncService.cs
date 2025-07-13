@@ -21,11 +21,11 @@ namespace ClipFlow.Core.Services
         private readonly string _clientId = Guid.NewGuid().ToString();
         private CancellationTokenSource? _uploadCancellationTokenSource;
         private readonly IClipboardMonitor _clipboardMonitor;
-        private string _baseUrl;
-        private string _wsUrl;
+        private string? _baseUrl;
+        private string? _wsUrl;
         private WebSocketService? _webSocketService;
 
-        public event Action<WebSocketState> OnWebSocketStateChanged;
+        public event Action<WebSocketState>? OnWebSocketStateChanged;
 
         public ClipboardSyncService(ConfigService configService,INotificationService notificationService, IClipboardMonitor clipboardMonitor)
         {
@@ -47,8 +47,8 @@ namespace ClipFlow.Core.Services
 
         public void Start()
         {
-            UpdateBaseUrl(_configService.CurrentConfig.Host);
-            UpdateHeaders(_configService.CurrentConfig.Token);
+            UpdateBaseUrl();
+            UpdateHeaders();
             if (string.IsNullOrEmpty(_baseUrl))
             {
                 LogService.Instance.AddLog("错误", "服务器地址未设置");
@@ -72,7 +72,8 @@ namespace ClipFlow.Core.Services
             _webSocketService = new WebSocketService(
                 _wsUrl,
                 _clientId,
-                _httpClient.DefaultRequestHeaders.GetValues("X-Auth-Token").FirstOrDefault() ?? string.Empty,
+                _configService.CurrentConfig.Token,
+                _configService.CurrentConfig.UserKey,
                 HandleWebSocketNotificationAsync);
 
             _webSocketService.StateChanged += (sender, state) =>
@@ -146,13 +147,13 @@ namespace ClipFlow.Core.Services
             );
             }
         }
-        public void UpdateBaseUrl(string url)
+        public void UpdateBaseUrl()
         {
-            if (string.IsNullOrEmpty(url)) return;
+            if (string.IsNullOrEmpty(_configService.CurrentConfig.Host)) return;
 
             try
             {
-                var uri = new Uri(url.TrimEnd('/'));
+                var uri = new Uri(_configService.CurrentConfig.Host.TrimEnd('/'));
                 var baseUri = new UriBuilder(uri)
                 {
                     Path = uri.AbsolutePath.TrimEnd('/'),
@@ -182,12 +183,12 @@ namespace ClipFlow.Core.Services
             }
         }
 
-        public void UpdateHeaders(string token)
+        public void UpdateHeaders()
         {
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("X-Auth-Token", token);
+            _httpClient.DefaultRequestHeaders.Add("X-Auth-Token", _configService.CurrentConfig.Token);
             _httpClient.DefaultRequestHeaders.Add("X-Client-Id", _clientId);
-
+            _httpClient.DefaultRequestHeaders.Add("X-User-Key", _configService.CurrentConfig.UserKey);
             // 如果WebSocket已连接，需要重新连接以使用新的凭证
             if (_webSocketService != null)
             {
@@ -388,7 +389,7 @@ namespace ClipFlow.Core.Services
                 {
                     try
                     {
-                        var url = $"{_baseUrl}/{data.Type.ToString().ToLower()}";
+                        var url = $"{_baseUrl}/{data.Type.ToString().ToLower()}?dataLength={data.DataLength}";
                         HttpContent content;
                         switch (data.Type)
                         {
@@ -503,5 +504,7 @@ namespace ClipFlow.Core.Services
         {
             return _webSocketService?.GetState() ?? WebSocketState.None;
         }
+
+
     }
 } 

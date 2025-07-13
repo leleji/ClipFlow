@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.MacOs", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipFlow.Desktop.Linux", "ClipFlow.Desktop.Linux\ClipFlow.Desktop.Linux.csproj", "{F962B5F2-B7CB-4703-BE13-7B13523F5DF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipFlow.Test", "ClipFlow.Test\ClipFlow.Test.csproj", "{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{F962B5F2-B7CB-4703-BE13-7B13523F5DF6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F962B5F2-B7CB-4703-BE13-7B13523F5DF6}.Release|x64.ActiveCfg = Release|Any CPU
 		{F962B5F2-B7CB-4703-BE13-7B13523F5DF6}.Release|x64.Build.0 = Release|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Debug|x64.Build.0 = Debug|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Release|x64.ActiveCfg = Release|Any CPU
+		{87A04CD9-40BF-465A-A8C9-1BB9C2DC0173}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

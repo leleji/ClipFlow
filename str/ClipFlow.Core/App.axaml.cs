@@ -19,7 +19,6 @@ namespace ClipFlow.Core
 {
     public partial class App : Application
     {
-        private Window? _mainWindow;
         private TrayIcon? _trayIcon;
         private IClassicDesktopStyleApplicationLifetime? _desktop;
         private bool _isShowingWindow = false;
@@ -29,7 +28,13 @@ namespace ClipFlow.Core
         }
         public override void OnFrameworkInitializationCompleted()
         {
-           
+            // 避免在 Avalonia Designer 模式下访问服务，因为不会调用Main()
+            if (Design.IsDesignMode)
+            {
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
@@ -54,7 +59,7 @@ namespace ClipFlow.Core
 #if DEBUG
             //Show();
 #endif
-            
+
             base.OnFrameworkInitializationCompleted();
         }
 
@@ -63,41 +68,51 @@ namespace ClipFlow.Core
         {
             if (_isShowingWindow) return;
             _isShowingWindow = true;
-            if (_mainWindow == null)
+
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                _mainWindow = new MainWindow
+                if (desktop.MainWindow == null)
                 {
-                    DataContext = AppServices.ServiceProvider.GetRequiredService<MainWindowViewModel>()
-                };
+                    desktop.MainWindow = new MainWindow
+                    {
+                        DataContext = AppServices.ServiceProvider.GetRequiredService<MainWindowViewModel>()
+                    };
 
-                // 关闭窗口时销毁引用，释放内存
-                _mainWindow.Closed += MainWindow_Closed;
+                    // 关闭窗口时销毁引用，释放内存
+                    desktop.MainWindow.Closed += MainWindow_Closed;
 
-                _mainWindow.Show();
+                    desktop.MainWindow.Show();
+                }
+                else
+                {
+                    desktop.MainWindow.Activate();
+                }
             }
-            else
-            {
-                _mainWindow.Activate();
-            }
+
             Dispatcher.UIThread.Post(() => _isShowingWindow = false, DispatcherPriority.Background);
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e)
         {
-            if (_mainWindow != null)
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
-                if (!configService.CurrentConfig.MinimizeToTray)
+                if (desktop.MainWindow != null)
                 {
-                    //如果的是不是最小化就关闭窗口
-                    Exit();
+                    var configService = AppServices.ServiceProvider.GetRequiredService<ConfigService>();
+                    if (!configService.CurrentConfig.MinimizeToTray)
+                    {
+                        //如果的是不是最小化就关闭窗口
+                        Exit();
+                    }
+                    else
+                    {
+                        desktop.MainWindow.Closed -= MainWindow_Closed;
+                        desktop.MainWindow = null;
+                    }
+
                 }
-                else {
-                    _mainWindow.Closed -= MainWindow_Closed;
-                    _mainWindow = null;
-                }
-                
             }
+
         }
         private void TrayIcon_Clicked(object? sender, EventArgs e)
         {
@@ -113,11 +128,11 @@ namespace ClipFlow.Core
                 _trayIcon = null;
             }
 
-            if (_mainWindow != null)
+            if (_desktop?.MainWindow != null)
             {
-                _mainWindow.Closed -= MainWindow_Closed; 
-                _mainWindow.Close();
-                _mainWindow = null;
+                _desktop.MainWindow.Closed -= MainWindow_Closed;
+                _desktop.MainWindow.Close();
+                _desktop.MainWindow = null;
             }
 
             _desktop?.Shutdown();

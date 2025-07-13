@@ -93,7 +93,6 @@ namespace ClipFlow.Desktop.Linux.Services
             // 使用 XFixesSelectSelectionInput 来监听剪贴板选择变化
             XFixesSelectSelectionInput(_display, rootWindow, clipboardAtom, 0x01); // 0x01 表示 SelectionNotify 事件
 
-            Console.WriteLine("正在监听剪贴板变化...");
             _clipboardHandler.Initialize();
             Task.Run(async () =>
             {

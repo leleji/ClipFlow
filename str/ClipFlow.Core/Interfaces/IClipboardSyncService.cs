@@ -9,8 +9,6 @@ namespace ClipFlow.Core.Interfaces
 
         void Start();
         void Stop();
-        void UpdateBaseUrl(string url);
-        void UpdateHeaders(string token);
         WebSocketState GetWebSocketState();
     }
 }

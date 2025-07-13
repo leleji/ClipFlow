@@ -1,19 +1,20 @@
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Runtime.InteropServices;
 using ClipFlow.Core.Models;
-using NLog.Config;
 using NLog;
+using NLog.Config;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace ClipFlow.Core.Services
 {
     public class ConfigService
     {
         private readonly string _configPath;
-        private Config _currentConfig;
+        private readonly AppConfig _currentConfig;
 
-        public Config CurrentConfig => _currentConfig;
+        public AppConfig CurrentConfig => _currentConfig;
 
         public ConfigService()
         {
@@ -62,14 +63,14 @@ namespace ClipFlow.Core.Services
             return Path.Combine(configDir, "config.json");
         }
 
-        private Config LoadConfig()
+        private AppConfig LoadConfig()
         {
             try
             {
                 if (File.Exists(_configPath))
                 {
                     var json = File.ReadAllText(_configPath);
-                    var config = JsonSerializer.Deserialize<Config>(json);
+                    var config = JsonSerializer.Deserialize<AppConfig>(json);
                     if (config != null)
                     {
                         return config;
@@ -84,7 +85,7 @@ namespace ClipFlow.Core.Services
                         try
                         {
                             var json = File.ReadAllText(oldConfigPath);
-                            var config = JsonSerializer.Deserialize<Config>(json);
+                            var config = JsonSerializer.Deserialize<AppConfig>(json);
                             if (config != null)
                             {
                                 // 保存到新位置
@@ -106,7 +107,7 @@ namespace ClipFlow.Core.Services
                 FileLogService.Instance.Error($"加载配置失败: {_configPath}", ex);
             }
 
-            return new Config();
+            return new AppConfig();
         }
 
         public void SaveConfig()
@@ -114,7 +115,7 @@ namespace ClipFlow.Core.Services
             SaveConfig(_currentConfig);
         }
 
-        private void SaveConfig(Config config)
+        private void SaveConfig(AppConfig config)
         {
             try
             {
@@ -148,6 +149,32 @@ namespace ClipFlow.Core.Services
             {
                 FileLogService.Instance.Error($"保存配置失败: {_configPath}", ex);
                 throw;
+            }
+        }
+        public void SettingsViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var propertyName = e.PropertyName;
+            if (string.IsNullOrEmpty(propertyName))
+                return;
+
+            var configType = CurrentConfig.GetType();
+
+            // 配置里是否存在同名属性
+            var configProp = configType.GetProperty(propertyName);
+            if (configProp == null)
+                return;
+
+            // ViewModel 同名属性
+            var vmProp = sender?.GetType().GetProperty(propertyName);
+            if (vmProp == null)
+                return;
+
+            var newValue = vmProp.GetValue(sender);
+            var oldValue = configProp.GetValue(CurrentConfig);
+            if (!Equals(oldValue, newValue))
+            {
+                configProp.SetValue(CurrentConfig, newValue);
+                SaveConfig();
             }
         }
     }

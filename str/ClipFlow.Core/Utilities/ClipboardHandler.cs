@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ namespace ClipFlow.Core.Utilities
                 Type = ClipboardType.Text,
                 Text = text,
                 ProcessName= processName,
+                DataLength = (ulong)text.Length,
                 Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text)
             };
         }
@@ -34,7 +36,7 @@ namespace ClipFlow.Core.Utilities
                 FileName = fileInfo.Name,
                 ProcessName = processName,
                 CopyFiles = [file],
-                DataLength = (ulong)file.Length,
+                DataLength = (ulong)fileInfo.Length,
                 Description = $"单文件: {fileInfo.Name}"
             };
         }

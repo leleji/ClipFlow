@@ -14,8 +14,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
-
 
 namespace ClipFlow.Desktop.Windows.Services
 {
@@ -35,7 +33,6 @@ namespace ClipFlow.Desktop.Windows.Services
 
         private string? _lastHash;
         private bool _isSettingClipboard;
-        private bool _isServerUpdate;
 
         public async Task<ClipboardData?> GetContentAsync()
         {
@@ -121,7 +118,6 @@ namespace ClipFlow.Desktop.Windows.Services
             try
             {
                 _isSettingClipboard = true;
-                _isServerUpdate = isServerUpdate;
                 switch (data.Type)
                 {
                     case ClipboardType.Text:
@@ -149,10 +145,6 @@ namespace ClipFlow.Desktop.Windows.Services
             finally
             {
                 _isSettingClipboard = false;
-                _ = Task.Delay(1000).ContinueWith(_ =>
-                {
-                    _isServerUpdate = false;
-                });
             }
             return true;
         }
