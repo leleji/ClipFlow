@@ -5,7 +5,7 @@
 	<LangVersion>latest</LangVersion>
 	<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 	<Version>0.1.0</Version>
-
+	
   </PropertyGroup>
 
 

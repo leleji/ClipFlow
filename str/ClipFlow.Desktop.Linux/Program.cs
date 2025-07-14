@@ -1,7 +1,5 @@
 using Avalonia;
 using System;
-using System.Runtime.InteropServices;
-using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using ClipFlow.Core.Interfaces;
 using ClipFlow.Desktop.Linux.Services;
@@ -25,27 +23,9 @@ internal class Program
         services.AddSingleton<IClipboardMonitor, ClipboardMonitor>();
         AppServices.ConfigureServices(services);
 
-
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        Core.Program.Build(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace()
-            .With(new FontManagerOptions
-            {
-                DefaultFamilyName = "avares://Avalonia.Fonts.Inter/Assets#Inter",
-                FontFallbacks =
-                [
-                    new FontFallback { FontFamily = "Microsoft YaHei UI" },
-                    new FontFallback { FontFamily = "Noto Sans CJK SC" },
-                    new FontFallback { FontFamily = "PingFang SC" },
-                    new FontFallback { FontFamily = "Source Han Sans SC" },
-                    new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
-                ]
-            });
+    public static AppBuilder BuildAvaloniaApp() => Core.Program.BuildAvaloniaApp();
 }

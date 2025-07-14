@@ -10,6 +10,7 @@ namespace ClipFlow.Core
     public class ClipboardMonitorTimer(IClipboardHandler clipboardHandler) : IClipboardMonitor
     {
         private bool _isMonitoring;
+        private bool _isChecking = false;
         private Timer? _timer;
 
         public event IClipboardMonitor.ClipboardChangedEventHandler? OnClipboardChanged;
@@ -43,11 +44,18 @@ namespace ClipFlow.Core
 
         private async Task CheckClipboardContent()
         {
-            if (!_isMonitoring) return;
-            var clipData =await clipboardHandler.GetContentAsync();
-            if (clipData != null)
+            if (!_isMonitoring || _isChecking) return;
+            try
             {
-                OnClipboardChanged?.Invoke(clipData);
+                var clipData = await clipboardHandler.GetContentAsync();
+                if (clipData != null)
+                {
+                    OnClipboardChanged?.Invoke(clipData);
+                }
+            }
+            finally
+            {
+                _isChecking = false;
             }
         }
 

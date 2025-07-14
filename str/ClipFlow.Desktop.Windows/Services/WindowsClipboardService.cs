@@ -37,7 +37,6 @@ namespace ClipFlow.Desktop.Windows.Services
         public async Task<ClipboardData?> GetContentAsync()
         {
             if (_isSettingClipboard) return null;
-
             try
             {
                 //包含FileDrop的都是文件，包括有些图片
@@ -93,7 +92,6 @@ namespace ClipFlow.Desktop.Windows.Services
             {
                 LogService.Instance.AddLog("错误", $"获取剪贴板内容失败: {ex.Message}");
             }
-
             return null;
         }
 

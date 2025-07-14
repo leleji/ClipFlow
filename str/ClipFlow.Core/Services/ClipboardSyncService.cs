@@ -422,7 +422,7 @@ namespace ClipFlow.Core.Services
                                 break;
                             if (!resjson.IsSuccessStatusCode)
                             {
-                                if (response.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
+                                if (resjson.Code == 413||response.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
                                 {
                                     LogService.Instance.AddLog("错误", $"文件太大: {resjson.Message}");
                                     break;

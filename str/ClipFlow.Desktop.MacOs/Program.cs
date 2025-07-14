@@ -1,5 +1,4 @@
-﻿using System;
-using AppKit;
+﻿using AppKit;
 using Avalonia;
 using Avalonia.Media;
 using ClipFlow.Core;
@@ -8,6 +7,8 @@ using ClipFlow.Core.Services;
 using ClipFlow.Desktop.MacOs.Services;
 using ClipFlow.Desktop.MacOS.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection.PortableExecutable;
 
 namespace ClipFlow.Desktop.MacOs;
 
@@ -36,24 +37,5 @@ internal class Program
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-    {
-        return AppBuilder.Configure(() => new App())
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace()
-            .With(new MacOSPlatformOptions { ShowInDock = false })
-            .With(new FontManagerOptions
-            {
-                DefaultFamilyName = "avares://Avalonia.Fonts.Inter/Assets#Inter",
-                FontFallbacks = new[]
-                {
-                    new FontFallback { FontFamily = "Microsoft YaHei UI" },
-                    new FontFallback { FontFamily = "Noto Sans CJK SC" },
-                    new FontFallback { FontFamily = "PingFang SC" },
-                    new FontFallback { FontFamily = "Source Han Sans SC" },
-                    new FontFallback { FontFamily = "WenQuanYi Micro Hei" }
-                }
-            });
-    }
+    public static AppBuilder BuildAvaloniaApp() => Core.Program.BuildAvaloniaApp();
 }
