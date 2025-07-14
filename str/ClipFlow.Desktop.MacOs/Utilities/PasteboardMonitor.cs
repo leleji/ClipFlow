@@ -6,35 +6,29 @@ using Avalonia.Threading;
 
 namespace ClipFlow.Desktop.MacOs.Utilities;
 
-
 public sealed class PasteboardMonitor : IAsyncDisposable
 {
-    private readonly record struct NativeMethods
-    {
-        [DllImport("/usr/lib/libobjc.dylib")]
-        public static extern IntPtr objc_getClass(string name);
-
-        [DllImport("/usr/lib/libobjc.dylib")]
-        public static extern IntPtr sel_registerName(string name);
-
-        [DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
-        public static extern IntPtr objc_msgSend_IntPtr(IntPtr receiver, IntPtr selector);
-
-        [DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
-        public static extern ulong objc_msgSend_UInt64(IntPtr receiver, IntPtr selector);
-
-        [DllImport("/usr/lib/libSystem.dylib")]
-        public static extern IntPtr dlopen(string path, int mode);
-
-        [DllImport("/usr/lib/libSystem.dylib")]
-        public static extern IntPtr dlerror();
-    }
-
     private const int RtldNow = 2;
-    private IntPtr _pasteboard;
     private readonly CancellationTokenSource _cts = new();
-    private Task? _monitorTask;
     private bool _isDisposed;
+    private Task? _monitorTask;
+    private IntPtr _pasteboard;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_isDisposed) return;
+
+        try
+        {
+            await StopAsync();
+        }
+        finally
+        {
+            _cts.Dispose();
+            _isDisposed = true;
+            GC.SuppressFinalize(this);
+        }
+    }
 
     public event EventHandler<PasteboardChangeEventArgs>? Changed;
 
@@ -49,8 +43,10 @@ public sealed class PasteboardMonitor : IAsyncDisposable
                 var errorMsg = Marshal.PtrToStringAnsi(error);
                 Console.WriteLine($"加载 AppKit 出错: {errorMsg}");
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -70,7 +66,7 @@ public sealed class PasteboardMonitor : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine( "获取剪贴板时出错");
+            Console.WriteLine("获取剪贴板时出错");
             return IntPtr.Zero;
         }
     }
@@ -85,7 +81,7 @@ public sealed class PasteboardMonitor : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine( "获取剪贴板计数时出错");
+            Console.WriteLine("获取剪贴板计数时出错");
             return 0;
         }
     }
@@ -129,9 +125,10 @@ public sealed class PasteboardMonitor : IAsyncDisposable
                         {
                             OnChanged(new PasteboardChangeEventArgs(lastChangeCount, currentChangeCount));
                         });
-                       
+
                         lastChangeCount = currentChangeCount;
                     }
+
                     await Task.Delay(100, _cts.Token);
                 }
             }
@@ -168,7 +165,7 @@ public sealed class PasteboardMonitor : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine( "停止监控时出错");
+            Console.WriteLine("停止监控时出错");
         }
         finally
         {
@@ -190,30 +187,36 @@ public sealed class PasteboardMonitor : IAsyncDisposable
         }
     }
 
-    public async ValueTask DisposeAsync()
+    private readonly record struct NativeMethods
     {
-        if (_isDisposed) return;
+        [DllImport("/usr/lib/libobjc.dylib")]
+        public static extern IntPtr objc_getClass(string name);
 
-        try
-        {
-            await StopAsync();
-        }
-        finally
-        {
-            _cts.Dispose();
-            _isDisposed = true;
-            GC.SuppressFinalize(this);
-        }
+        [DllImport("/usr/lib/libobjc.dylib")]
+        public static extern IntPtr sel_registerName(string name);
+
+        [DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
+        public static extern IntPtr objc_msgSend_IntPtr(IntPtr receiver, IntPtr selector);
+
+        [DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
+        public static extern ulong objc_msgSend_UInt64(IntPtr receiver, IntPtr selector);
+
+        [DllImport("/usr/lib/libSystem.dylib")]
+        public static extern IntPtr dlopen(string path, int mode);
+
+        [DllImport("/usr/lib/libSystem.dylib")]
+        public static extern IntPtr dlerror();
     }
 }
+
 public class PasteboardChangeEventArgs : EventArgs
 {
-    public ulong OldCount { get; }
-    public ulong NewCount { get; }
-
     public PasteboardChangeEventArgs(ulong oldCount, ulong newCount)
     {
         OldCount = oldCount;
         NewCount = newCount;
     }
+
+    public ulong OldCount { get; }
+    public ulong NewCount { get; }
 }

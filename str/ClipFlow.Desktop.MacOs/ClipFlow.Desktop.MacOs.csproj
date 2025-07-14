@@ -11,15 +11,15 @@
         <ApplicationId>com.leleji.ClipFlow</ApplicationId>
         <InfoPlistPath>Info.plist</InfoPlistPath>
         <CFBundleIconFile>logo.icns</CFBundleIconFile>
-        <ApplicationIcon>..\ClipFlow.Desktop\Assets\logo.ico</ApplicationIcon>
+        <ApplicationIcon>..\ClipFlow.Core\Assets\logo.ico</ApplicationIcon>
         <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
     </PropertyGroup>
     <ItemGroup>
-        <BundleResource Include="..\ClipFlow.Desktop\Assets\logo.icns">
+        <BundleResource Include="..\ClipFlow.Core\Assets\logo.icns">
             <Link>logo.icns</Link>
         </BundleResource>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\ClipFlow.Core\ClipFlow.Core.csproj" />
+        <ProjectReference Include="..\ClipFlow.Core\ClipFlow.Core.csproj"/>
     </ItemGroup>
 </Project>
