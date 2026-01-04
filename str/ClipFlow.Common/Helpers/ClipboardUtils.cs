@@ -1,3 +1,4 @@
+using ClipFlow.Common.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,11 +8,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using ClipFlow.Common.Helpers;
-using ClipFlow.Core.Services;
 
-namespace ClipFlow.Core.Utilities
+namespace ClipFlow.Common.Utilities
 {
     public static class ClipboardUtils
     {

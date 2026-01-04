@@ -33,7 +33,7 @@ internal class Program
         {
             services.AddSingleton<IClipboardMonitor, ClipboardMonitor>();
         }
-        AppServices.ConfigureServices(services);
+        ServiceExtensions.ConfigureServices(services);
 
         Core.Program.Build(args);
     }

@@ -1,9 +1,12 @@
 using ClipFlow.Core.Models;
+using ClipFlow.Core.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using NLog;
 using NLog.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -14,12 +17,17 @@ namespace ClipFlow.Core.Services
         private readonly string _configPath;
         private readonly AppConfig _currentConfig;
 
-        public AppConfig CurrentConfig => _currentConfig;
+        /// <summary>
+        /// 错误上传开关变化事件（给 Infrastructure 用）
+        /// </summary>
+        public event Action<bool>? AllowErrorUploadChanged;
 
+        public AppConfig CurrentConfig => _currentConfig;
         public ConfigService()
         {
             _configPath = GetConfigFilePath();
             _currentConfig = LoadConfig();
+            _currentConfig.PropertyChanged += SettingsViewModel_PropertyChanged;
         }
 
         private string GetConfigFilePath()
@@ -70,7 +78,7 @@ namespace ClipFlow.Core.Services
                 if (File.Exists(_configPath))
                 {
                     var json = File.ReadAllText(_configPath);
-                    var config = JsonSerializer.Deserialize<AppConfig>(json);
+                    var config = JsonSerializer.Deserialize<AppConfig>(json, AppConfigJsonContext.Default.AppConfig);
                     if (config != null)
                     {
                         return config;
@@ -85,7 +93,7 @@ namespace ClipFlow.Core.Services
                         try
                         {
                             var json = File.ReadAllText(oldConfigPath);
-                            var config = JsonSerializer.Deserialize<AppConfig>(json);
+                            var config = JsonSerializer.Deserialize(json, AppConfigJsonContext.Default.AppConfig);
                             if (config != null)
                             {
                                 // 保存到新位置
@@ -119,10 +127,7 @@ namespace ClipFlow.Core.Services
         {
             try
             {
-                var json = JsonSerializer.Serialize(config, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                var json = JsonSerializer.Serialize(config, AppConfigJsonContext.Default.AppConfig);
 
                 // 使用临时文件来保存，以防保存过程中出错导致配置文件损坏
                 var tempPath = _configPath + ".tmp";
@@ -156,26 +161,11 @@ namespace ClipFlow.Core.Services
             var propertyName = e.PropertyName;
             if (string.IsNullOrEmpty(propertyName))
                 return;
-
-            var configType = CurrentConfig.GetType();
-
-            // 配置里是否存在同名属性
-            var configProp = configType.GetProperty(propertyName);
-            if (configProp == null)
-                return;
-
-            // ViewModel 同名属性
-            var vmProp = sender?.GetType().GetProperty(propertyName);
-            if (vmProp == null)
-                return;
-
-            var newValue = vmProp.GetValue(sender);
-            var oldValue = configProp.GetValue(CurrentConfig);
-            if (!Equals(oldValue, newValue))
+            if (e.PropertyName == nameof(AppConfig.AllowErrorUpload))
             {
-                configProp.SetValue(CurrentConfig, newValue);
-                SaveConfig();
+                AllowErrorUploadChanged?.Invoke(CurrentConfig.AllowErrorUpload);
             }
+            SaveConfig();
         }
     }
 } 

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using ClipFlow.Common.Helpers;
 
 namespace ClipFlow.Core.ViewModels
 {
@@ -18,9 +19,9 @@ namespace ClipFlow.Core.ViewModels
         public event EventHandler LogItemsChanged;
 
         [ObservableProperty]
-        private Services.LogItem _selectedLogItem;
+        private LogItem _selectedLogItem;
 
-        public IEnumerable<Services.LogItem> LogItems => _logService.LogItems;
+        public IEnumerable<LogItem> LogItems => _logService.LogItems;
 
         public static IBrush TimestampBrush => Application.Current!.ActualThemeVariant == ThemeVariant.Dark 
             ? new SolidColorBrush(Color.FromRgb(180, 180, 180))

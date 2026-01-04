@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ClipFlow.Core.Interfaces;
+using ClipFlow.Common.Helpers;
 
 namespace ClipFlow.Core.Services
 {
@@ -20,18 +21,20 @@ namespace ClipFlow.Core.Services
         private readonly HttpClient _httpClient;
         private readonly string _clientId = Guid.NewGuid().ToString();
         private CancellationTokenSource? _uploadCancellationTokenSource;
-        private readonly IClipboardMonitor _clipboardMonitor;
+        private readonly IClipboardWatcher _clipboardWatcher;
+        private readonly IClipboardHandler _clipboardHandler;
         private string? _baseUrl;
         private string? _wsUrl;
         private WebSocketService? _webSocketService;
 
         public event Action<WebSocketState>? OnWebSocketStateChanged;
 
-        public ClipboardSyncService(ConfigService configService,INotificationService notificationService, IClipboardMonitor clipboardMonitor)
+        public ClipboardSyncService(ConfigService configService,INotificationService notificationService, IClipboardWatcher clipboardWatcher, IClipboardHandler clipboardHandler)
         {
             _configService = configService;
             _notificationService= notificationService;
-            _clipboardMonitor = clipboardMonitor;
+            _clipboardWatcher = clipboardWatcher;
+            _clipboardHandler =clipboardHandler;
             var handler = new HttpClientHandler
             {
                 MaxRequestContentBufferSize = 524288000 // 500MB
@@ -42,7 +45,7 @@ namespace ClipFlow.Core.Services
                 Timeout = TimeSpan.FromMinutes(30)
             };
 
-            clipboardMonitor.OnClipboardChanged += ClipboardMonitor_OnClipboardChanged;
+            clipboardWatcher.ClipboardChanged += OnClipboardDataReceivedAsync;
         }
 
         public void Start()
@@ -55,13 +58,13 @@ namespace ClipFlow.Core.Services
                 return;
             }
 
-            _clipboardMonitor.Start();
+            _clipboardWatcher.Start();
             StartWebSocket();
         }
 
         public void Stop()
         {
-            _clipboardMonitor.Stop();
+            _clipboardWatcher.Stop();
             StopWebSocket();
         }
 
@@ -119,7 +122,7 @@ namespace ClipFlow.Core.Services
                         await responseStream.CopyToAsync(fileStream);
                     };
                      var clipboardInfo = await CompressionEncryptor.DecryptTemporaryFileToClipboardDataAsync($"{tempPath}{data.Uuid}.dat", _configService.CurrentConfig.DataKey);
-                    if (await _clipboardMonitor.SetClipboardContentAsync(clipboardInfo, true))
+                    if (await _clipboardHandler.SetContentAsync(clipboardInfo, true))
                     {
                         if (config.EnableDownloadNotification)
                         {
@@ -357,7 +360,7 @@ namespace ClipFlow.Core.Services
             return new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".ico", ".tiff" }.Contains(extension);
         }
 
-        private async void ClipboardMonitor_OnClipboardChanged(ClipboardData data)
+        private  async void OnClipboardDataReceivedAsync(ClipboardData data)
         {
             if (_uploadCancellationTokenSource != null)
             {
@@ -495,7 +498,7 @@ namespace ClipFlow.Core.Services
         {
             _uploadCancellationTokenSource?.Cancel();
             _uploadCancellationTokenSource?.Dispose();
-            _clipboardMonitor?.Dispose();
+            _clipboardWatcher?.Dispose();
             _webSocketService?.Dispose();
             _httpClient?.Dispose();
         }

@@ -10,24 +10,14 @@ namespace ClipFlow.Core.ViewModels
 {
     public partial class SyncSettingsViewModel : ViewModelBase, IDisposable
     {
-        private readonly ConfigService _configService;
+        public ConfigService ConfigService { get; }
+
+
         private readonly IClipboardSyncService _clipboardSyncService;
         private Action<WebSocketState>? _webSocketStateHandler;
 
         [ObservableProperty]
         private bool _isEnabled;
-
-        [ObservableProperty]
-        private string _host;
-
-        [ObservableProperty]
-        private string _token;
-
-        [ObservableProperty]
-        private string _userKet;
-
-        [ObservableProperty]
-        private string _dataKey;
 
         [ObservableProperty]
         private string? _serverStatus;
@@ -36,14 +26,9 @@ namespace ClipFlow.Core.ViewModels
             ConfigService configService,
             IClipboardSyncService clipboardSyncService)
         {
-            _configService = configService;
+            ConfigService = configService;
             _clipboardSyncService = clipboardSyncService;
             
-            // 加载配置
-            _host = _configService.CurrentConfig.Host;
-            _token = _configService.CurrentConfig.Token;
-            _dataKey = _configService.CurrentConfig.DataKey;
-            _userKet= _configService.CurrentConfig.UserKey;
             // 订阅WebSocket状态变化
             _webSocketStateHandler = state =>
             {
@@ -64,7 +49,7 @@ namespace ClipFlow.Core.ViewModels
             _webSocketStateHandler(currentState);
 
             // 设置启用状态，但不触发OnIsEnabledChanged
-            _isEnabled = _configService.CurrentConfig.IsEnabled;
+            _isEnabled = ConfigService.CurrentConfig.IsEnabled;
 
         }
 
@@ -80,33 +65,11 @@ namespace ClipFlow.Core.ViewModels
                 _clipboardSyncService.Stop();
             }
 
-            _configService.CurrentConfig.IsEnabled = value;
-            _configService.SaveConfig();
+            ConfigService.CurrentConfig.IsEnabled = value;
+            ConfigService.SaveConfig();
         }
 
-        partial void OnHostChanged(string value)
-        {
-            _configService.CurrentConfig.Host = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnTokenChanged(string value)
-        {
-            _configService.CurrentConfig.Token = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnUserKetChanged(string value)
-        {
-            _configService.CurrentConfig.UserKey = value;
-            _configService.SaveConfig();
-        }
-
-        partial void OnDataKeyChanged(string value)
-        {
-            _configService.CurrentConfig.DataKey = value;
-            _configService.SaveConfig();
-        }
+        
         #endregion
 
         public void Dispose()

@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:ClipFlow.Core.ViewModels"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:controls="using:ClipFlow.Core.Controls"
+			 x:Class="ClipFlow.Desktop.Views.SettingsPage"
+			 x:DataType="vm:SettingsViewModel">
+	<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+				  VerticalScrollBarVisibility="Auto"
+				  Margin="0,0,8,0">
+		<StackPanel Spacing="20" Margin="30,0,22,0">
+			<controls:SettingItem Title="自动启动"
+								  Description="开机时自动启动程序">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding AutoStart}"
+								  OnContent=""
+								  OffContent=""
+								  Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+			<controls:SettingItem Title="最小化到托盘"
+								  Description="关闭窗口时最小化到系统托盘">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding ConfigService.CurrentConfig.MinimizeToTray}"
+								  OnContent=""
+								  OffContent=""
+								  Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+			<controls:SettingItem Title="剪贴板监控模式(重启生效)"
+								  Description="推荐模式高效模式，如果无法使用就采用兼容模式，兼容模式会有延迟">
+				<controls:SettingItem.ActionContent>
+					<ComboBox SelectedIndex="{Binding ConfigService.CurrentConfig.ClipboardMonitorMode}"
+							  MinWidth="120"
+							  VerticalAlignment="Center">
+						<ComboBoxItem>高效模式</ComboBoxItem>
+						<ComboBoxItem>兼容模式</ComboBoxItem>
+					</ComboBox>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+
+			<controls:SettingItem Title="主题模式"
+								  Description="设置应用的主题模式">
+				<controls:SettingItem.ActionContent>
+					<ComboBox SelectedIndex="{Binding ConfigService.CurrentConfig.ThemeMode}"
+							  MinWidth="120"
+							  VerticalAlignment="Center">
+						<ComboBoxItem>跟随系统</ComboBoxItem>
+						<ComboBoxItem>浅色模式</ComboBoxItem>
+						<ComboBoxItem>深色模式</ComboBoxItem>
+					</ComboBox>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+						<controls:SettingItem Title="上传崩溃日志"
+								  Description="收集非敏感的用户数据，以帮助ClipFlow提升用户体验，所有数据都是匿名收集的，并不会定位到个人身份。">
+				<controls:SettingItem.ActionContent>
+					<ToggleSwitch IsChecked="{Binding ConfigService.CurrentConfig.AllowErrorUpload}"
+								  OnContent=""
+								  OffContent=""
+								  Margin="0,-6,0,-6"/>
+				</controls:SettingItem.ActionContent>
+			</controls:SettingItem>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>
