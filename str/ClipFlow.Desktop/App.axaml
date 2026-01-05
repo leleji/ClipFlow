@@ -21,16 +21,33 @@
 		<ResourceDictionary>
 			<ResourceDictionary.ThemeDictionaries>
 				<ResourceDictionary x:Key="Light">
+					<!-- 面板 -->
 					<Color x:Key="BorderBackgroundColor">#15000000</Color>
 					<Color x:Key="BorderBrushColor">#22000000</Color>
+
+					<!-- 字体 -->
+					<Color x:Key="TextPrimaryColor">#FF000000</Color>
+					<Color x:Key="TextSecondaryColor">#99000000</Color>
+
+					<SolidColorBrush x:Key="WindowBackgroundBrush"
+                                     Color="#CCF3F3F3"/>
 				</ResourceDictionary>
 				<ResourceDictionary x:Key="Dark">
+					<!-- 面板 -->
 					<Color x:Key="BorderBackgroundColor">#22FFFFFF</Color>
 					<Color x:Key="BorderBrushColor">#33FFFFFF</Color>
+
+					<!-- 字体 -->
+					<Color x:Key="TextPrimaryColor">#E6FFFFFF</Color>
+					<Color x:Key="TextSecondaryColor">#B3FFFFFF</Color>
+
+					<SolidColorBrush x:Key="WindowBackgroundBrush"
+                                     Color="#CC1E1E1E"/>
 				</ResourceDictionary>
+
 			</ResourceDictionary.ThemeDictionaries>
 
-			<!-- SVG ͼ����Դ -->
+			<!-- SVG -->
 			<StreamGeometry x:Key="home_icon">M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69M12 3L2 12H5V20H11V14H13V20H19V12H22L12 3Z</StreamGeometry>
 			<StreamGeometry x:Key="upload_icon">M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z</StreamGeometry>
 			<StreamGeometry x:Key="download_icon">M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z</StreamGeometry>
@@ -43,7 +60,7 @@
 	<Application.Styles>
 		<FluentTheme />
 
-		<!-- ��������ʽ -->
+		<!-- 滚动条-->
 		<Style Selector="ScrollBar">
 			<Setter Property="Background" Value="Transparent"/>
 			<Setter Property="Width" Value="4"/>

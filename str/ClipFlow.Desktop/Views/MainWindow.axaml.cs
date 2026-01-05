@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using System;
 
 namespace ClipFlow.Desktop.Views
 {
@@ -8,6 +9,25 @@ namespace ClipFlow.Desktop.Views
         public MainWindow()
         {
             InitializeComponent();
+            Opened += OnOpened;
+        }
+        private void OnOpened(object? sender, EventArgs e)
+        {
+            ApplyPlatformChrome();
+        }
+
+        private void ApplyPlatformChrome()
+        {
+            //if (OperatingSystem.IsMacOS())
+            //{
+            //    ExtendClientAreaToDecorationsHint = false;
+            //}
+            //else
+            //{
+            //    ExtendClientAreaToDecorationsHint = true;
+            //    ExtendClientAreaTitleBarHeightHint = 70;
+            //}
+            //ExtendClientAreaToDecorationsHint = false;
         }
 
     }

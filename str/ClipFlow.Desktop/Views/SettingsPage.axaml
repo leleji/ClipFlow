@@ -10,7 +10,7 @@
 	<ScrollViewer HorizontalScrollBarVisibility="Disabled"
 				  VerticalScrollBarVisibility="Auto"
 				  Margin="0,0,8,0">
-		<StackPanel Spacing="20" Margin="30,0,22,0">
+		<StackPanel Spacing="20" Margin="0,0,22,0">
 			<controls:SettingItem Title="自动启动"
 								  Description="开机时自动启动程序">
 				<controls:SettingItem.ActionContent>
@@ -54,7 +54,7 @@
 				</controls:SettingItem.ActionContent>
 			</controls:SettingItem>
 						<controls:SettingItem Title="上传崩溃日志"
-								  Description="收集非敏感的用户数据，以帮助ClipFlow提升用户体验，所有数据都是匿名收集的，并不会定位到个人身份。">
+								  Description="收集非敏感的匿名用户数据，以帮助ClipFlow提升用户体验。">
 				<controls:SettingItem.ActionContent>
 					<ToggleSwitch IsChecked="{Binding ConfigService.CurrentConfig.AllowErrorUpload}"
 								  OnContent=""

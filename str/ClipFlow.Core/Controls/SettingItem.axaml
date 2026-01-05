@@ -22,7 +22,8 @@
                 <TextBlock Text="{Binding #Control.Title}"
                           FontSize="13"
                           FontWeight="SemiBold"
-                          VerticalAlignment="Center"/>
+                          VerticalAlignment="Center"
+                          Foreground="{DynamicResource TextPrimaryColor}"/>
             </Grid>
             
             <ContentPresenter Grid.RowSpan="2" Grid.Column="1"
@@ -47,7 +48,7 @@
             
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                       Text="{Binding #Control.Description}"
-                      Foreground="{DynamicResource SystemBaseMediumColor}"
+                      Foreground="{DynamicResource TextSecondaryColor}"
                       FontSize="11"
                       Margin="0,4,0,0"/>
         </Grid>
