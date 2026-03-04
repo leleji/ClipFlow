@@ -26,14 +26,15 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
         }
 
 
+        [DllImport("user32.dll")]
+        public static extern void PostQuitMessage(int nExitCode);
 
         [LibraryImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static partial bool AddClipboardFormatListener(IntPtr hwnd);
 
-        [LibraryImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool RemoveClipboardFormatListener(IntPtr hwnd);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
 
         [LibraryImport("user32.dll", EntryPoint = "CreateWindowExW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
         public static partial IntPtr CreateWindowEx(
@@ -53,9 +54,12 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
         [LibraryImport("user32.dll", EntryPoint = "DispatchMessageW")]
         public static partial IntPtr DispatchMessage(ref MSG lpMsg);
 
-        [LibraryImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern bool PostMessage(
+            IntPtr hWnd,
+            int Msg,
+            IntPtr wParam,
+            IntPtr lParam);
 
 
         // --- User32.dll 剪贴板相关 ---

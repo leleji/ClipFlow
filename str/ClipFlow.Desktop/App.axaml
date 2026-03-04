@@ -29,8 +29,16 @@
 					<Color x:Key="TextPrimaryColor">#FF000000</Color>
 					<Color x:Key="TextSecondaryColor">#99000000</Color>
 
-					<SolidColorBrush x:Key="WindowBackgroundBrush"
-                                     Color="#CCF3F3F3"/>
+					<!-- 日志时间 -->
+					<SolidColorBrush x:Key="LogTimestampBrush">#646464</SolidColorBrush>
+
+					<!-- 类型 -->
+					<SolidColorBrush x:Key="LogTypeBrush">#0078D7</SolidColorBrush>
+
+					<!-- 内容 -->
+					<SolidColorBrush x:Key="LogMessageBrush">#1E1E1E</SolidColorBrush>
+
+
 				</ResourceDictionary>
 				<ResourceDictionary x:Key="Dark">
 					<!-- 面板 -->
@@ -41,8 +49,16 @@
 					<Color x:Key="TextPrimaryColor">#E6FFFFFF</Color>
 					<Color x:Key="TextSecondaryColor">#B3FFFFFF</Color>
 
-					<SolidColorBrush x:Key="WindowBackgroundBrush"
-                                     Color="#CC1E1E1E"/>
+
+
+					<!-- 日志时间 -->
+					<SolidColorBrush x:Key="LogTimestampBrush">#B4B4B4</SolidColorBrush>
+
+					<!-- 类型 -->
+					<SolidColorBrush x:Key="LogTypeBrush">#4DB3FF</SolidColorBrush>
+
+					<!-- 内容 -->
+					<SolidColorBrush x:Key="LogMessageBrush">#DCDCDC</SolidColorBrush>
 				</ResourceDictionary>
 
 			</ResourceDictionary.ThemeDictionaries>

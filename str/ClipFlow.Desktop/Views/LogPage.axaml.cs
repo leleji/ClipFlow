@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Avalonia;
 using ClipFlow.Common.Helpers;
+using ClipFlow.Common.Models;
 
 namespace ClipFlow.Desktop.Views
 {
@@ -18,27 +19,32 @@ namespace ClipFlow.Desktop.Views
         {
             InitializeComponent();
 
-            // 订阅日志添加事件
-            LogService.Instance.LogAdded += (s, e) =>
-            {
-                ScrollToBottom();
-            };
+            AttachedToVisualTree += OnAttachedToVisualTree;
+            DetachedFromVisualTree += OnDetachedFromVisualTree;
+        }
 
-            // 订阅页面加载事件
-            this.AttachedToVisualTree += (s, e) =>
-            {
-                ScrollToBottom();
-            };
+
+        private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            LogService.Instance.LogAdded += OnLogAdded;
+            ScrollToBottom();
+        }
+
+        private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            LogService.Instance.LogAdded -= OnLogAdded;
+        }
+
+        private void OnLogAdded(object? sender, EventArgs e)
+        {
+            ScrollToBottom();
         }
 
         private void ScrollToBottom()
         {
-            Dispatcher.UIThread.Post(async () =>
-            {
-                // 等待一帧以确保布局已更新
-                await Task.Delay(10);
-                LogScrollViewer?.ScrollToEnd();
-            });
+            Dispatcher.UIThread.Post(
+                () => LogScrollViewer?.ScrollToEnd(),
+                DispatcherPriority.Background);
         }
 
         private void OnLogItemPressed(object? sender, PointerPressedEventArgs e)

@@ -1,3 +1,4 @@
+using ClipFlow.Common.Models;
 using System;
 using System.Collections.ObjectModel;
 
@@ -16,51 +17,32 @@ namespace ClipFlow.Common.Helpers
 
         public void AddLog(string type, string message)
         {
-            try
+            var log = new LogItem
             {
-                try
-                {
-                    var log = new LogItem
-                    {
-                        Type = type,
-                        Message = message,
-                        Timestamp = DateTime.Now
-                    };
+                Type = type,
+                Message = message,
+                Timestamp = DateTime.Now
+            };
 
-                    // 从末尾添加日志
-                    LogItems.Add(log);
+            // 从末尾添加日志
+            LogItems.Add(log);
 
-                    // 如果超过最大条数，移除最早的日志
-                    while (LogItems.Count > MaxLogItems)
-                    {
-                        LogItems.RemoveAt(0);
-                    }
-
-                    // 触发日志添加事件，用于滚动到底部
-                    LogAdded?.Invoke(this, EventArgs.Empty);
-                }
-                catch
-                {
-                    // 忽略日志记录错误
-                }
-            }
-            catch
+            // 如果超过最大条数，移除最早的日志
+            while (LogItems.Count > MaxLogItems)
             {
-                // 忽略 Dispatcher 访问错误
+                LogItems.RemoveAt(0);
             }
+
+            // 触发日志添加事件，用于滚动到底部
+            LogAdded?.Invoke(this, EventArgs.Empty);
         }
 
         public void Clear()
         {
             LogItems.Clear();
+
         }
     }
 
-    public class LogItem
-    {
-        public DateTime Timestamp { get; set; }
-        public required string Type { get; set; }
-        public required string Message { get; set; }
-        public bool IsSelected { get; set; }
-    }
+
 } 

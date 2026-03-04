@@ -37,13 +37,13 @@
                                     PointerPressed="OnLogItemPressed">
                                 <TextBlock TextWrapping="Wrap" MaxWidth="{Binding $parent[ScrollViewer].Bounds.Width}">
                                     <Run Text="{Binding Timestamp, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" 
-                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).TimestampBrush}"/>
+                                         Foreground="{DynamicResource LogTimestampBrush}"/>
                                     <Run Text=" "/>
                                     <Run Text="{Binding Type}" 
-                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).TypeBrush}"/>
+                                         Foreground="{DynamicResource LogTypeBrush}"/>
                                     <Run Text=": "/>
                                     <Run Text="{Binding Message}"
-                                         Foreground="{Binding $parent[UserControl].((vm:LogViewModel)DataContext).MessageBrush}"/>
+                                         Foreground="{DynamicResource LogMessageBrush}"/>
                                 </TextBlock>
                             </Border>
                         </DataTemplate>

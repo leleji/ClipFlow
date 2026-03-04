@@ -1,6 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Styling;
 using System;
+
 
 namespace ClipFlow.Desktop.Views
 {
@@ -9,25 +12,46 @@ namespace ClipFlow.Desktop.Views
         public MainWindow()
         {
             InitializeComponent();
-            Opened += OnOpened;
+            UpdateWindowBackground();
+           
+
         }
-        private void OnOpened(object? sender, EventArgs e)
+        protected override void OnOpened(EventArgs e)
         {
-            ApplyPlatformChrome();
+            base.OnOpened(e);
+            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
+            UpdateWindowBackground();
         }
 
-        private void ApplyPlatformChrome()
+        protected override void OnClosed(EventArgs e)
         {
-            //if (OperatingSystem.IsMacOS())
-            //{
-            //    ExtendClientAreaToDecorationsHint = false;
-            //}
-            //else
-            //{
-            //    ExtendClientAreaToDecorationsHint = true;
-            //    ExtendClientAreaTitleBarHeightHint = 70;
-            //}
-            //ExtendClientAreaToDecorationsHint = false;
+            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
+            base.OnClosed(e);
+        }
+
+        private void OnThemeChanged(object? sender, EventArgs e)
+        {
+            UpdateWindowBackground();
+        }
+        private void UpdateWindowBackground()
+        {
+            var level = ActualTransparencyLevel;
+            var isDark = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+            if (level == WindowTransparencyLevel.Mica)
+            {
+                Background = Brushes.Transparent;
+               
+            }
+            else if(level == WindowTransparencyLevel.AcrylicBlur)
+            {
+                Background = new SolidColorBrush(
+                   Color.Parse(isDark ? "#CC1E1E1E" : "#CCF3F3F3"));
+            }
+            else
+            {
+                Background = new SolidColorBrush(
+                    Color.Parse(isDark ? "#FF1E1E1E" : "#FFFFFFFF"));
+            }
         }
 
     }

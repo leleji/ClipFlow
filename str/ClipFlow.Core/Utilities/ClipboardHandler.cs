@@ -25,6 +25,7 @@ namespace ClipFlow.Core.Utilities
                 DataLength = (ulong)text.Length,
                 Description = "文本: " + (text.Length > 30 ? text[..30] + "..." : text)
             };
+
         }
 
         public static ClipboardData ProcessSingleFile(string file, string processName = "")

@@ -1,10 +1,13 @@
 ﻿using Avalonia.Input;
 using Avalonia.Input.Platform;
+using ClipFlow.Common.Utilities;
 using ClipFlow.Core.Constants;
 using ClipFlow.Core.Interfaces;
 using ClipFlow.Core.Models;
 using ClipFlow.Core.Services;
+using ClipFlow.Core.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -15,6 +18,9 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
 {
     public class WindowsClipboardHandler1 : IClipboardHandler
     {
+
+
+        private string? _lastHash;
         public void Initialize() { /* Windows 原生不需要特殊初始化 */ }
         public void Cleanup() { /* 释放资源 */ }
 
@@ -42,7 +48,11 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
 
             if (formats.Contains(DataFormat.File))
             {
-                var bytes = await ClipboardManager.Clipboard.TryGetFilesAsync();
+                var list = await ClipboardManager.Clipboard.TryGetFilesAsync();
+                var filesHash = Common.Utilities.ClipboardUtils.GetMd5Hash(string.Join("|", list.Select(v=>v.Path.LocalPath)));
+                if (filesHash == _lastHash) return null;
+                _lastHash = filesHash;
+
             }
             else if (formats.Contains(DataFormat.Bitmap)) 
             {
@@ -59,7 +69,10 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
             {
                 var text = await ClipboardManager.Clipboard.TryGetTextAsync();
                 if (string.IsNullOrEmpty(text)) return null;
-                return new ClipboardData { Text= text, Type= ClipboardType.Text };
+                var textHash = Common.Utilities.ClipboardUtils.GetMd5Hash(text);
+                if (textHash == _lastHash) return null;
+                _lastHash = textHash;
+                return ClipboardProcess.ProcessText(text);
             }
 
 

@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <Folder Include="Constants\" />
-    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Sentry" Version="6.0.0" />
     <PackageReference Include="System.Text.Json" Version="10.0.1" />
   </ItemGroup>

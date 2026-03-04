@@ -51,7 +51,7 @@ namespace ClipFlow.Infrastructure.Platforms.Windows
                 // 停止监听
                 Win32Native.RemoveClipboardFormatListener(_hwnd);
                 // 关键：向消息循环发送退出指令，否则 GetMessage 会一直阻塞线程
-                Win32Native.PostMessage(_hwnd, 0x0012, IntPtr.Zero, IntPtr.Zero); // WM_QUIT
+                Win32Native.PostMessage(_hwnd, 0x0010, IntPtr.Zero, IntPtr.Zero);
             }
         }
 

@@ -8,8 +8,7 @@
 		x:DataType="vm:MainWindowViewModel"
 		Title="ClipFlow"
 		Width="800" Height="500"
-		TransparencyLevelHint="Mica,AcrylicBlur"
-		Background="{DynamicResource WindowBackgroundBrush}"
+		TransparencyLevelHint="Mica,AcrylicBlur,None"
 		WindowStartupLocation="CenterScreen">
 
 	<!-- ================== 全局样式 ================== -->
